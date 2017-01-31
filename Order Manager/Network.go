@@ -15,10 +15,24 @@ const (
 // end of var list
 
 
-type Elev struct {
-    Last_Floor int
-    Direction Direction
+type All_Orders struct {
+	elev1 struct{
+		Last_Floor int
+    	Direction Direction
+   		orders [][]int
+	}
 
+    elev2 struct{
+		Last_Floor int
+    	Direction Direction
+   		orders [][]int
+	}
+
+	elev3 struct{
+		Last_Floor int
+    	Direction Direction
+   		orders [][]int
+	}
 }
 
 
@@ -52,10 +66,4 @@ func Assign_Order(){
 
 func main() {
 	Assign_Order();
-
-    orders := [][]int{}
-    row1 := []int{1, 2, 3}
-    row2 := []int{4, 5, 6}
-    orders = append(orders, row1)
-    orders = append(orders, row2)
 }
