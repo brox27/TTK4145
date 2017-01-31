@@ -4,8 +4,9 @@ import (
 )
 
 // Variables that should come from somewhere else!!
-var NUM_ELEVATORS = 3;
+const NUM_ELEVATORS = 3;
 var Elevators_Alive = 3;
+const num_floors = 4;
 type Direction int;
 const (
  DOWN Direction = -1 + iota
@@ -31,9 +32,11 @@ type All_Orders struct {
 	elev3 struct{
 		Last_Floor int
     	Direction Direction
-   		orders [][]int
+   		orders [4][3]int
 	}
+	hesten int
 }
+
 
 
 func Assign_Order(){
@@ -60,10 +63,16 @@ func Assign_Order(){
 			Cheapest_Elev = elev;
 		}
 	}
-	//Cheapest_Elev += 12;
 }
 
+func (f *All_Orders) Update_Orders(floor int, elevator int){
+	for i := 0; i<3;i++{
+		f.elev3.orders[floor][i]=1
+	}
+}
 
 func main() {
-	Assign_Order();
+	All_Orders := All_Orders{}
+	All_Orders.Update_Orders(1,3)
+	println(All_Orders.elev3.orders[1][1])
 }
