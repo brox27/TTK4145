@@ -7,6 +7,7 @@ import (
 const NUM_ELEVATORS = 3;
 var Elevators_Alive = 3;
 const num_floors = 4;
+
 type Direction int;
 const (
  DOWN Direction = -1 + iota
@@ -17,6 +18,11 @@ const (
 
 
 type All_Orders struct {
+//	id
+//	signal type
+//	elev id
+
+	
 	elev1 struct{
 		Last_Floor int
     	Direction Direction

@@ -1,14 +1,18 @@
+// Com manager
+
+
 package main
 
 import (
-	"./bcast"
-	"./localip"
-	"./peers"
+	"../Config File"
+	"../Communication Manager"
 	"flag"
 	"fmt"
 	"os"
 	"time"
 )
+
+
 
 // We define some custom struct to send over the network.
 // Note that all members we want to transmit must be public. Any private members
