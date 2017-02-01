@@ -47,7 +47,7 @@ type allOrders struct {
    		orders [][]int
 	}
 
-	elev2 struct{
+    elev2 struct{
 		Last_Floor int
     	Direction Direction
    		orders [][]int
