@@ -1,56 +1,57 @@
 package ConfigFile
 
+const NUM_ELEVATORS = 3
 
-const NUM_ELEVATORS = 3;
-var Elevators_Alive = 3;
-const num_floors = 4;
-const num_buttons = 3;
+var Elevators_Alive = 3
 
-type Direction int;
+const Num_floors = 4
+const Num_buttons = 3
+
+type Direction int
+
 const (
- DOWN Direction = -1 + iota
- NEUTRAL
- UP
+	DOWN Direction = -1 + iota
+	NEUTRAL
+	UP
 )
 
 type newOrder struct {
-	msgId int
-	floor int
-	button int
-
+	MsgId  int
+	Floor  int
+	Button int
 }
 
-type completeOrder struct{
-	msgId int
-	floor int
-	button int
+type completeOrder struct {
+	MsgId  int
+	Floor  int
+	Button int
 }
 
 type acknowledge struct {
-	msgId int
+	MsgId int
 }
 
-type heartbeat struct{
-	msgId int
+type Heartbeat struct {
+	MsgId int
 }
 
-type allOrders struct {
-
-	elev1 struct{
-		Last_Floor int
-    		Direction Direction
-   		orders [][]int
+type AllOrders struct {
+	Elev1 struct {
+		LastFloor int
+		Direction Direction
+		Orders    [Num_floors][Num_buttons]int
 	}
 
-	elev2 struct{
-		Last_Floor int
-    		Direction Direction
-   		orders [][]int
+	Elev2 struct {
+		LastFloor int
+		Direction Direction
+		Orders    [Num_floors][Num_buttons]int
 	}
 
-	elev3 struct{
-		Last_Floor int
-    		Direction Direction
-   		orders [4][3]int
+	Elev3 struct {
+		LastFloor int
+		Direction Direction
+		Orders    [Num_floors][Num_buttons]int
 	}
+	Hest int
 }
