@@ -1,26 +1,26 @@
 // Com manager
 
-
 package main
 
 import (
 	. "../ConfigFile"
-//	"../CommunicationManager"
-//	"flag"
-//	"fmt"
-//	"os"
-//	"time"
+	//	"../CommunicationManager"
+	//	"flag"
+	//	"fmt"
+	//	"os"
+	//	"time"
 )
 
-func (f *All_Information) function(){
-	f.id = 12;
+func (f *All_Information) function() {
+	f.id = 12
 
 }
 
-func main (){
+func main() {
 	println("hei")
 
-	Test := All_Information {}
+	Test := All_Information{}
 	Test.function()
 }
 
+// update
