@@ -4,6 +4,7 @@ package main
 
 import (
 	. "../ConfigFile"
+	. "../Network"
 	//	"../CommunicationManager"
 	//	"flag"
 	//	"fmt"
@@ -19,8 +20,8 @@ func (f *All_Information) function() {
 func main() {
 	println("hei")
 
-	Test := All_Information{}
-	Test.function()
+//	Test := All_Information{}
+//	Test.function()
 }
 
 // update
