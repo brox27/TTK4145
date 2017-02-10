@@ -35,23 +35,11 @@ type Heartbeat struct {
 	MsgId int
 }
 
-type AllOrders struct {
-	Elev1 struct {
-		LastFloor int
-		Direction Direction
-		Orders    [Num_floors][Num_buttons]int
-	}
-
-	Elev2 struct {
-		LastFloor int
-		Direction Direction
-		Orders    [Num_floors][Num_buttons]int
-	}
-
-	Elev3 struct {
-		LastFloor int
-		Direction Direction
-		Orders    [Num_floors][Num_buttons]int
-	}
-	Hest int
+type Elev struct {
+	LastFloor int
+	Direction Direction
+	Orders    [Num_floors][Num_buttons]int
+	//id 			string
 }
+
+var AllOrders map[string]*Elev

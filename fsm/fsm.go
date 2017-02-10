@@ -48,11 +48,46 @@ func elevRun(arrivedFloor chan Order, prevOrder chan Order, delOrder chan Order,
 	}
 }
 
+func newOrder(ch def.channels) {
+	switch localElev.state {
+	case def.running:
+	case: def.idle
+		// blabla hvordan vi handler dette i ordermanager?
+	case def.doorOpen:
+		if queue.shouldStop(def.localElev.floor, def.localElev.dir) {
+			ch.timerReset <- true
+		}
+	}
+}
+
+func arrivedFloor(ch def.channels, newFloor int) {
+	def.localElev.Floor = newFloor
+	ch.newFloor <- def.localElev.floor
+	switch def.localElev.state{
+	case def.RUNNING:
+		if queue.shouldStop(def.localElev.floor, def.localElev.dir) {
+			def.localElev.state = def.doorOpen
+			Elev_set_door_open_lamp(1)
+			// ha all funksjonaliteten som skal kalles i doorOpen-staten i shouldStop?
+		}
+		else {
+			ch.motorDir <- def.localElev.dir 
+			def.localElev.state = def.running
+		}
+	case def.doorOpen:
+		if queue.shouldStop(def.localElev.floor, def.localElev.dir) {
+			ch.timerReset <- true //hvis dør har åpnet seg, reset timer på at elev er alive
+		}
+	default:
+	}
+}
+
 func elevDoorOpen(nextOrder Order, delOrder chan Order, state chan state) {
 	if Elev_get_floor_sensor_signal() != -1 {
 		Elev_set_door_open_lamp(1)
 		state <- doorOpen
 		time.Sleep(3 * time.Second)
+		// heller ha en egen doorTimer funksjon?
 	}
 	state <- idle	// ha en egen WAIT state?
 	Elev_set_door_open_lamp(0)
