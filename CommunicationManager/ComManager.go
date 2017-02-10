@@ -4,7 +4,7 @@ package main
 
 import (
 	. "../ConfigFile"
-	. "../Network"
+//S	. "../Network"
 	//	"../CommunicationManager"
 	//	"flag"
 	//	"fmt"
@@ -12,16 +12,22 @@ import (
 	//	"time"
 )
 
-func (f *All_Information) function() {
-	f.id = 12
-
-}
 
 func main() {
 	println("hei")
-
 //	Test := All_Information{}
 //	Test.function()
-}
+	hestefaen := NewOrder{}
 
-// update
+	NO := make(chan NewOrder)	// MÅ en spessifisere hvor mange en vil ha..??
+//	completeOrder := make(chan completeOrder)
+//	acknowledge := make(chan acknowledge)
+//	Heartbeat := make(chan Heartbeat)
+	// newOrder := make(chan newOrder) --> må vel ha en til her for "ALL-orders"
+
+	NO <- hestefaen
+
+	hesten := Num_floors
+	hesten ++
+// skal dette i main/init eller 
+}

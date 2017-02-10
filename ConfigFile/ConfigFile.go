@@ -15,19 +15,19 @@ const (
 	UP
 )
 
-type newOrder struct {
+type NewOrder struct {
 	MsgId  int
 	Floor  int
 	Button int
 }
 
-type completeOrder struct {
+type CompleteOrder struct {
 	MsgId  int
 	Floor  int
 	Button int
 }
 
-type acknowledge struct {
+type Acknowledge struct {
 	MsgId int
 }
 
