@@ -5,10 +5,10 @@ import (
 )
 
 func ordersAbove(f map[string]*Elev, ip string) bool {
-	floor := f[ip].LastFloor //NB!! HARDKODET!!! PÅ ELEV1 $$$$ DETTE MÅ ENDRES!\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ <-- se der er du grei
+	floor := f[ip].LastFloor 
 	for i := floor; i < Num_floors; i++ {
 		for j := 0; j < Num_buttons; j++ {
-			if f[ip].Orders[i][j] == 1 { //NB!! HARDKODET!!! PÅ ELEV1 $$$$ DETTE MÅ ENDRES!\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ <-- se der er du grei
+			if f[ip].Orders[i][j] == 1 { 
 				return true
 			}
 		}
@@ -60,7 +60,7 @@ func nextDirection(f map[string]*Elev, ip string) Direction {
 	}
 }
 
-func ShouldStop(f map[string]*Elev, ip string, curFloor int) bool {			// NB! sender inn curr floor! må se om vi oppdaterer i STRUCKTEN så vi evt kan bruke den
+func ShouldStop(f map[string]*Elev, ip string, curFloor int) bool {			// NB! sender inn curr floor! Se når struckt oppdateres om vi må det
 	for i := 0; i < Num_buttons; i++ {
 		if f[ip].Orders[curFloor-1][i] == 1 { 
 			println("SHOULD STOP!")
@@ -71,6 +71,43 @@ func ShouldStop(f map[string]*Elev, ip string, curFloor int) bool {			// NB! sen
 	return false
 }
 
+func calculateCost(f map[string]*Elev, ip string) int {
+	return 12
+
+}
+
+func ipOfElevThatShouldTakeOrder(f map[string]*Elev, ip string, floor int, button int) string {			//Nytt navn!! + array med alle IPer??
+	winnerIP := ""
+	lowestCost := 99999999
+
+	// her må en loop settes inn for alle..
+	thisCost := calculateCost(f, ip)
+	if (thisCost < lowestCost){
+		winnerIP = ip
+		lowestCost = thisCost	
+	}
+
+	if ( thisCost == lowestCost){
+		if (ip < winnerIP){		// V. LIKHET ER DET DEN MED LAVEST IP SOM VINNER!!
+			winnerIP = ip
+		}
+	}
+	// slutt loopen
+
+	return winnerIP
+}
+
+
+func recalculateOrders(f map[string]*Elev, ipOfDead string, ip string){	// bytte ut IP med array? over de som er levende
+	for floor := 0; floor <Num_floors; floor++{
+		for button := 0; button < (Num_buttons-1); button++{
+			if f[ipOfDead].Orders[floor][button] == 1{
+				ipWinner := ipOfElevThatShouldTakeOrder(f, ip, floor, button)
+				f[ipWinner].Orders[floor][button] = 1	// bør en kanskje heller kalle en funksjon for dette..? mtp god kode?
+			}
+		}
+	}
+}
 
 func main() {
 	elev1 := Elev{}
@@ -81,12 +118,11 @@ func main() {
 //
 
 //
-
-//
 // UNDER ER TEST VARIABLER/FUNCTIONER
 	TEST(AllOrders)
 	ShouldStop(AllOrders, "123.123.13.123", 2)
 	nextDirection(AllOrders, "123.123.13.123")
+	println(ipOfElevThatShouldTakeOrder(AllOrders, "123.123.13.123",1,1))
 }
 
 //
