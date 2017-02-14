@@ -13,7 +13,7 @@ import (
 
 
 
-// ALL code below are steol(read borrowed) from Anders 
+// ALL code below are stolen(read borrowed) from Anders 
 func Transmitter(port int, chans ...interface{}) {
 	checkArgs(chans...)
 
