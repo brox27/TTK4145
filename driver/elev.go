@@ -51,7 +51,7 @@ func SetMotorDirection( dir Direction){
 
 
 func SetButtonLamp(button ButtonType, floor int, value int){
-	if ((N_FLOORS>=floor&&floor>0)&&(0<button&&button<=N_BUTTONS)){
+	if ((N_FLOORS>floor&&floor>=0)&&(0<button&&button<=N_BUTTONS)){
 		if (value==1){
 			Io_set_bit(LAMP_CHANNEL_MATRIX[floor][button])
 		}else{
@@ -62,7 +62,7 @@ func SetButtonLamp(button ButtonType, floor int, value int){
 
 
 func SetFloorLight(floor int){
-	if (N_FLOORS>=floor&&floor>0){
+	if (N_FLOORS>floor&&floor>=0){
 		if (floor&0x02!=0) {
         Io_set_bit(LIGHT_FLOOR_IND1);
     	}else {
@@ -89,7 +89,7 @@ func SetDoorOpenLamp(value int){
 
 func GetButtonSignal(button ButtonType, floor int) int{
 	if((N_FLOORS>=floor&&floor>0)&&(0<button&&button<=N_BUTTONS)){
-		return Io_read_bit(BUTTON_CHANNEL_MATRIX[floor][button])
+		return Io_read_bit(BUTTON_CHANNEL_MATRIX[floor-1][button])
 	}
 	return 0
 }
