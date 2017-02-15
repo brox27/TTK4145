@@ -30,8 +30,8 @@ func main() {
 			}
 
 		}
-
 	*/
+
 	buttonChannel := make(chan ButtonType, N_BUTTONS*N_FLOORS)
 	go ButtonCheck(buttonChannel)
 	for {

@@ -18,6 +18,7 @@ func ButtonCheck(ch chan ButtonType) {
 			for j := 1; j <= N_FLOORS; j++ {
 				if GetButtonSignal(ButtonType(i), j) == 1 {
 					Println(ButtonType(i))
+
 					pressedButtons = append(pressedButtons, ButtonType(i))
 				}
 			}
