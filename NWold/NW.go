@@ -1,19 +1,20 @@
 package Network
 
-
 import (
+	"./conn"
 	"./localip"
 	"./peers"
-	"flag"
+	"json"
+	"net"
+	"reflect"
+	"strings"
+	//"flag"
 	"fmt"
-	"os"
-	"time"
+	//"os"
+	//"time"
 )
 
-
-
-
-// ALL code below are stolen(read borrowed) from Anders 
+// ALL code below are stolen(read borrowed) from Anders
 func Transmitter(port int, chans ...interface{}) {
 	checkArgs(chans...)
 
