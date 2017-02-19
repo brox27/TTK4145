@@ -60,17 +60,12 @@ func EventHandler(eventChan chan map[Event]interface{}) {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	eventMap := make(map[Event]interface{}) //maps necessary data (value) to an event (key)
 
-	firstIter := true
-
 	buttonChan := make(chan [2]int)
-	floorChan := make(chan int)
 
 	go buttonPoll(buttonChan)
-	go floorPoll(floorChan)
-
+	buttonData := <-buttonChan
 	for {
 
-		buttonData := <-buttonChan
 		data, ok := eventMap[ButtonPressed].([2]int)
 
 		if !ok {
@@ -91,37 +86,28 @@ func EventHandler(eventChan chan map[Event]interface{}) {
 			}
 		}
 
-		floor := <-floorChan
-		if firstIter {
+		floor := GetFloorSensorSignal()
+
+		data2, ok2 := eventMap[NewFloor].(int)
+
+		if !ok2 {
 			eventMap[NewFloor] = floor
 			eventChan <- eventMap
+
 		} else {
-			if floor != eventMap[NewFloor] {
+
+			if floor != data2 {
 				eventMap[NewFloor] = floor
 				eventChan <- eventMap
 			}
 		}
-		/*
-			data2, ok2 := eventMap[NewFloor].(int)
 
-			if (!ok2){
-				eventMap[NewFloor] = floor
-				eventChan <- eventMap
-
-			} else {
-
-				if (floor != data2) {
-					eventMap[NewFloor] = floor
-					eventChan <- eventMap
-				}
-			}
-		*/
 		/*
 			if ((&floor != nil) && (floor != data2)) || ((&buttonData != nil) && !((buttonData[0] == 0 && buttonData[1] == 4) || (buttonData[0] == 1 && buttonData[1] == 1)) && !(buttonData[0] == data[0] && buttonData[1] == data[1])) {
 				eventChan <- eventMap
 			}*/
 		//what else
-		firstIter = false
+		buttonData = <-buttonChan
 	}
 
 }
