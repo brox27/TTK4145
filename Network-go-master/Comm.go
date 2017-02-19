@@ -54,51 +54,46 @@ func main() {
 	go bcast.Transmitter(16569, HeartbeatTx)
 	go bcast.Receiver(16569, HeartbeatRx)
 
-	// < ALL ORDERS > \\
-	// < ALL ORDERS > \\
-
-	//
-
-	// %% her (tror) jeg vi må ha ett eller annet mer, men faen ikke sikker på hva
-
-	//
-
-	//
-
-	//
 	time.Sleep(1 * time.Second)
-	//
-	//	go DoSomethingSmart(CompleteOrderTx, CompleteOrderRx)
-	//
 
-	hesten := ConfigFile.NewOrder{}
-	hesten.MsgId = 12
-	Send(hesten)
-
+	hest := ConfigFile.NewOrder{}
+	Sender(hest)
 }
 
-// Den som "snakker" med FSM o.l. -> input arg er en struct basert på hva som vil sendes (Heartbeat/NewOrder e.l.)
-func Send(name interface{}) {
-	if c, ok := name.(ConfigFile.NewOrder); ok {
-		fmt.Println(c.MsgId)
+
+func Sender(data interface{}) int{
+	ThisMsgId := 12
+    switch t := data.(type) {
+        case ConfigFile.NewOrder:
+            fmt.Println("New Order")
+
+        case ConfigFile.CompleteOrder:
+            fmt.Println("CompleteOrder")
+
+        case ConfigFile.Acknowledge:
+            fmt.Println("Acknowledge")
+
+        case ConfigFile.Heartbeat:
+            fmt.Println("Heartbeat")
+
+        default:
+            fmt.Printf("ERROR: Unknown type: %T", t)
+    }
+    ThisMsgId ++
+
+
+    numAcks := 0
+
+    for i:=0;i<100;i++{
+	    inncomming := ConfigFile.Acknowledge{}
+		if inncomming.MsgId == ThisMsgId{
+			numAcks ++
+		}else{
+			// put back on channeL???
+		}
+		fmt.Println("lolz kjorer")
+		time.Sleep(100*time.Millisecond)
 	}
-	println(name)
+	fmt.Println("lolz ute m.", numAcks)
+	return numAcks
 }
-
-/*
-func DoSomethingSmart(channel chan ConfigFile.CompleteOrder, inn chan ConfigFile.CompleteOrder) {
-
-	// f.eks sende signal og vente på ack/telle ack
-	varr := ConfigFile.CompleteOrder{}
-	varr.MsgId = 12
-	varr.Button = 3
-	varr.Floor = 2
-
-	channel <- varr
-	time.Sleep(1 * time.Second)
-	recieved := <-inn
-	fmt.Printf("Received: %#v\n", recieved)
-
-}
-
-*/
