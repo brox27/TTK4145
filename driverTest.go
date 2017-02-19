@@ -1,13 +1,15 @@
-package main
+package driverTest
 
 import (
 	. "./driver"
 	. "./globals"
 	. "fmt"
-	. "time"
+	"runtime"
+	//. "time"
 )
 
-func main() {
+func driverTest() {
+	runtime.GOMAXPROCS(runtime.NumCPU())
 	InitElev()
 
 	/*
@@ -32,13 +34,15 @@ func main() {
 		}
 	*/
 
-	buttonChannel := make(chan ButtonType, N_BUTTONS*N_FLOORS)
-	go ButtonCheck(buttonChannel)
-	for {
-		button := <-buttonChannel
-		Println(button)
-		Sleep(Second)
-	}
+	/*
+		buttonChannel := make(chan [2]int, N_BUTTONS*N_FLOORS)
+		go ButtonPoll(buttonChannel)
+		for {
+			data := <-buttonChannel //data = {button, floor}
+			Println(data)
+		}
+	*/
+
 	/*
 		for {
 			floor := GetFloorSensorSignal()
@@ -72,5 +76,11 @@ func main() {
 		}
 	*/
 
-	defer SetMotorDirection(IDLE)
+	eventChan := make(chan map[Event]interface{})
+	go EventHandler(eventChan)
+	for {
+		Println(<-eventChan)
+	}
+
+	defer SetMotorDirection(NEUTRAL)
 }

@@ -40,7 +40,7 @@ func InitElev() {
 }
 
 func SetMotorDirection(dir Direction) {
-	if dir == IDLE {
+	if dir == NEUTRAL {
 		Io_write_analog(MOTOR, 0)
 	} else if dir == UP {
 		Io_clear_bit(MOTORDIR)
