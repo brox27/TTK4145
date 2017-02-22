@@ -29,13 +29,15 @@ type OrderMsg struct {
 	MsgType int
 }
 
-const OrderState (
-	inactive
-	staged
-	active
+type OrderState int
+
+const (	//OrderState 
+	Inactive OrderState = iota +1
+	PendingAck		// Samme som din pendig ACK?
+	Active
 )
 type OrderStatus struct {
-	OrderState  int
+	OrderState  OrderState
 	AckdBy 		[]string
 }
 
