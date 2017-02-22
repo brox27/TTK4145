@@ -7,14 +7,11 @@ package globals
 */
 
 import (
-	"C"
-	//. "time"
 )
 
 const N_ELEVATORS = 3
 const N_FLOORS = 4
 const N_BUTTONS = 3
-
 const MOTOR_SPEED = 2800
 
 type Direction int
@@ -28,7 +25,23 @@ const (
 type ButtonType int
 
 const (
-	Button_Order_Up ButtonType = iota
-	Button_Order_Down
-	Button_Order_Command
+	BUTTON_ORDER_UP ButtonType = iota
+	BUTTON_ORDER_DOWN
+	BUTTON_ORDER_COMMAND
 )
+
+type NewOrder struct {
+	MsgId  int
+	Floor  int
+	Button int
+}
+
+type CompleteOrder struct {
+	MsgId  int
+	Floor  int
+	Button int
+}
+
+
+
+var ELEVATOR_IPS=[N_ELEVATORS]string{"123.123.123","321.321.321","asd.asd.asd"}

@@ -34,6 +34,16 @@ func InitElev() {
 		}
 	}
 
+	if(GetFloorSensorSignal()==-1){
+			SetMotorDirection(DOWN)
+	}
+	for{
+		if(GetFloorSensorSignal()!=-1){
+			SetMotorDirection(NEUTRAL)
+			break
+		}
+	}
+
 	SetStopLamp(0)
 	SetDoorOpenLamp(0)
 	SetFloorLight(0)

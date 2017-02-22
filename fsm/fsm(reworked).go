@@ -1,7 +1,7 @@
 package fsm
 
 import (
-	."./driver"
+	."../driver"
 	"time"
 	"os"
 	)

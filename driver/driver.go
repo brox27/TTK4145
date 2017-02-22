@@ -9,15 +9,15 @@ import (
 type ButtonState int
 
 const (
-	Pressed ButtonState = iota
-	Released
+	PRESSED ButtonState = iota
+	RELEASED
 )
 
 type Event int
 
 const (
-	ButtonPressed Event = iota
-	NewFloor
+	BUTTON_PRESSED Event = iota
+	NEW_FLOOR
 	//TimedOut
 )
 
@@ -25,7 +25,7 @@ func ButtonPoll(buttonChan chan [2]int) {
 	ButtonMap := make(map[[2]int]ButtonState) //Ensures that each
 	for i := 0; i < N_BUTTONS; i++ {          //buttonpress is registered only once
 		for j := 1; j <= N_FLOORS; j++ {
-			ButtonMap[[2]int{i, j}] = Released
+			ButtonMap[[2]int{i, j}] = RELEASED
 		}
 	}
 
@@ -34,7 +34,7 @@ func ButtonPoll(buttonChan chan [2]int) {
 			for j := 1; j <= N_FLOORS; j++ {
 				if (GetButtonSignal(ButtonType(i), j) == 1) && (ButtonMap[[2]int{i, j}] != Pressed) {
 					buttonChan <- [2]int{i, j}
-					ButtonMap[[2]int{i, j}] = Pressed
+					ButtonMap[[2]int{i, j}] = PRESSED
 				}
 			}
 		}
@@ -42,7 +42,7 @@ func ButtonPoll(buttonChan chan [2]int) {
 		for i := 0; i < N_BUTTONS; i++ {
 			for j := 1; j <= N_FLOORS; j++ {
 				if GetButtonSignal(ButtonType(i), j) == 0 {
-					ButtonMap[[2]int{i, j}] = Released
+					ButtonMap[[2]int{i, j}] = RELEASED
 				}
 			}
 		}
@@ -69,7 +69,7 @@ func EventHandler(eventChan chan map[Event]interface{}) {
 		data, ok := eventMap[ButtonPressed].([2]int)
 
 		if !ok {
-			eventMap[ButtonPressed] = buttonData
+			eventMap[BUTTON_PRESSED] = buttonData
 			eventChan <- eventMap
 
 		} else {
@@ -79,7 +79,7 @@ func EventHandler(eventChan chan map[Event]interface{}) {
 				if !((buttonData[0] == 0 && buttonData[1] == 4) || (buttonData[0] == 1 && buttonData[1] == 1)) {
 
 					if !(buttonData[0] == data[0] && buttonData[1] == data[1]) {
-						eventMap[ButtonPressed] = buttonData
+						eventMap[BUTTON_PRESSED] = buttonData
 						eventChan <- eventMap
 					}
 				}
@@ -91,23 +91,18 @@ func EventHandler(eventChan chan map[Event]interface{}) {
 		data2, ok2 := eventMap[NewFloor].(int)
 
 		if !ok2 {
-			eventMap[NewFloor] = floor
+			eventMap[NEW_FLOOR] = floor
 			eventChan <- eventMap
 
 		} else {
 
 			if floor != data2 {
-				eventMap[NewFloor] = floor
+				eventMap[NEW_FLOOR] = floor
 				eventChan <- eventMap
 			}
 		}
 
-		/*
-			if ((&floor != nil) && (floor != data2)) || ((&buttonData != nil) && !((buttonData[0] == 0 && buttonData[1] == 4) || (buttonData[0] == 1 && buttonData[1] == 1)) && !(buttonData[0] == data[0] && buttonData[1] == data[1])) {
-				eventChan <- eventMap
-			}*/
 		//what else
-		//buttonData = <-buttonChan
 	}
 
 }
