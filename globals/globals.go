@@ -30,6 +30,20 @@ const (
 	BUTTON_ORDER_COMMAND
 )
 
+type MsgType int
+const(
+	NEW MsgType = iota
+	ACKNOWLEDGE
+	COMPLETE
+)
+
+type OrderMsg struct{
+	Button int
+	Floor int
+	MsgType MsgType
+}
+
+/*
 type NewOrder struct {
 	MsgId  int
 	Floor  int
@@ -41,7 +55,6 @@ type CompleteOrder struct {
 	Floor  int
 	Button int
 }
-
-
+*/
 
 var ELEVATOR_IPS=[N_ELEVATORS]string{"123.123.123","321.321.321","asd.asd.asd"}

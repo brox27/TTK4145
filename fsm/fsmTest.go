@@ -21,9 +21,9 @@ const (
 type Elevator struct {
 	State States
 	LastFloor int
-	Direction Direction
+	Dir Direction
 	Orders    [N_FLOORS][N_BUTTONS]int
-	id 			string
+	Id 			string
 }
 
 var ALL_ELEVATORS map[string]*Elevator
@@ -47,7 +47,7 @@ func (elev *Elevator) RUN() {
 			for{
 				if(GetFloorSignal()!=-1){
 					elev.State=IDLE
-					elev.dir=IDLE
+					elev.Dir=IDLE
 					break
 				}
 			}
@@ -66,9 +66,10 @@ func (elev *Elevator) RUN() {
 				}
 
 				if j==3{
-					order := NewOrder{}
+					order := OrderMsg{}
 					order.Button=data[0]
 					order.Floor=data[1]
+					order.MsgType=NEW
 
 					go Sender(order)
 
