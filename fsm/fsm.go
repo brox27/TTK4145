@@ -65,7 +65,7 @@ func arrivedFloor(ch def.channels, newFloor int) {
 	ch.newFloor <- def.localElev.floor
 	switch def.localElev.state{
 	case def.RUNNING:
-		if orderManagerg.shouldStop(def.localElev.floor, def.localElev.dir) {
+		if orderManager.shouldStop(def.localElev.floor, def.localElev.dir) {
 			def.localElev.state = def.doorOpen
 			Elev_set_door_open_lamp(1)
 			// ha all funksjonaliteten som skal kalles i doorOpen-staten i shouldStop?

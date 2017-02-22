@@ -7,11 +7,12 @@ import (
 	)
 
 const (
-	INITIALIZE = 0
-	IDLE = 1
-	RUNNING = 2
-	ARRIVEDFLOOR = 3
-	SHOULDSTOP = 4
+
+	INITIALIZE int iota
+	IDLE 
+	RUNNING 
+	ARRIVEDFLOOR 
+	SHOULDSTOP 
 	// trenger vi flere states?
 )
 
@@ -22,9 +23,10 @@ type FsmEvent struct {
 }
 
 type Elevator struct {	
-	State int
-	Dir int
+	states State 
+	dir Direction
 	Floor int
+	orders[][] int
 	// interne ordre?
 }
 
