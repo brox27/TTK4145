@@ -5,36 +5,36 @@ import (
 	"./network/bcast"
 	"./network/localip"
 	"./network/peers"
+	"flag"
 	"fmt"
 	"os"
 	"time"
 )
 
-struct sendChan{
-	chan ConfigFile.NewOrder
-	chan ConfigFile.CompleteOrder
-	chan ConfigFile.Acknowledge
-	chan ConfigFile.Heartbeat
+type channels struct {
+	NewOrder      chan ConfigFile.NewOrder
+	CompleteOrder chan ConfigFile.CompleteOrder
+	Acknowledge   chan ConfigFile.Acknowledge
+	Heartbeat     chan ConfigFile.Heartbeat
 }
 
-struct recieveChan{
-	chan ConfigFile.NewOrder
-	chan ConfigFile.CompleteOrder
-	chan ConfigFile.Acknowledge
-	chan ConfigFile.Heartbeat
-}
+var sendChan channels
+var recieveChan channels
 
 func main() {
 
 	// setter opp -- aka Anders work
 	var id string
+	flag.StringVar(&id, "id", "", "id of this peer")
+	flag.Parse()
+
 	if id == "" {
 		localIP, err := localip.LocalIP()
 		if err != nil {
 			fmt.Println(err)
 			localIP = "DISCONNECTED"
 		}
-		id = fmt.Sprintf("peer-%s-%d", localIP, os.Getpid())
+		id = fmt.Sprintf("peer-%s-%d", localIP, os.Getpid()) // fjerne os.Getpid for å ikke prosessor ID -> stor forldel om restarte prosessen!
 	}
 
 	peerUpdateCh := make(chan peers.PeerUpdate)
@@ -43,23 +43,27 @@ func main() {
 	go peers.Receiver(15647, peerUpdateCh)
 
 	// Setter opp EGNE recieve channels
-	NewOrderRx := make(chan ConfigFile.NewOrder, 5)
-	CompleteOrderRx := make(chan ConfigFile.CompleteOrder, 5)
-	AcknowledgeRx := make(chan ConfigFile.Acknowledge, 5)
-	HeartbeatRx := make(chan ConfigFile.Heartbeat, 5)
+	recieveChan.NewOrder = make(chan ConfigFile.NewOrder, 5)
+	recieveChan.CompleteOrder = make(chan ConfigFile.CompleteOrder, 5)
+	recieveChan.Acknowledge = make(chan ConfigFile.Acknowledge, 5)
+	recieveChan.Heartbeat = make(chan ConfigFile.Heartbeat, 5)
 
 	// < ALL ORDERS > \\
 
 	// Setter opp EGNE Send channels
-	NewOrderTx := make(chan ConfigFile.NewOrder, 5)
-	CompleteOrderTx := make(chan ConfigFile.CompleteOrder, 5)
-	AcknowledgeTx := make(chan ConfigFile.Acknowledge, 5)
-	HeartbeatTx := make(chan ConfigFile.Heartbeat, 5)
+	sendChan.NewOrder = make(chan ConfigFile.NewOrder, 5)
+	sendChan.CompleteOrder = make(chan ConfigFile.CompleteOrder, 5)
+	sendChan.Acknowledge = make(chan ConfigFile.Acknowledge, 5)
+	sendChan.Heartbeat = make(chan ConfigFile.Heartbeat, 5)
 	// < ALL ORDERS > \\
+	go bcast.Transmitter(16569, sendChan.NewOrder, sendChan.CompleteOrder, sendChan.Acknowledge, sendChan.Heartbeat)
+	go bcast.Receiver(16569, recieveChan.NewOrder, recieveChan.CompleteOrder, recieveChan.Acknowledge, recieveChan.Heartbeat)
 
-	// setter opp alle rutinene for å sende..?
-	go bcast.Transmitter(16569, NewOrderTx, CompleteOrderTx, AcknowledgeTx, HeartbeatTx)
-	go bcast.Receiver(16569, NewOrderRx, CompleteOrderRx, AcknowledgeRx, HeartbeatRx)
+	// IGNORA ALL BELLOW -- test variabler ++
+	p := <-peerUpdateCh
+	println("lol<")
+	fmt.Println(p.Peers)
+	println("lol>")
 
 	time.Sleep(1 * time.Second)
 
@@ -73,33 +77,35 @@ func Sender(data interface{}) bool {
 	switch t := data.(type) {
 	case ConfigFile.NewOrder:
 		fmt.Println("New Order")
+		sendChan.NewOrder <- t
 
 	case ConfigFile.CompleteOrder:
 		fmt.Println("CompleteOrder")
+		sendChan.CompleteOrder <- t
 
 	case ConfigFile.Acknowledge:
 		fmt.Println("Acknowledge")
+		sendChan.Acknowledge <- t
 
 	case ConfigFile.Heartbeat:
 		fmt.Println("Heartbeat")
+		sendChan.Heartbeat <- t
 
 	default:
 		fmt.Printf("ERROR: Unknown type: %T", t)
+		return false
 	}
-	
-	ThisMsgId++
-	numAcks := 0
 
-	for i := 0; i < 100; i++ {
-		inncomming := ConfigFile.Acknowledge{}
-		if inncomming.MsgId == ThisMsgId {
-			numAcks++
-		} else {
-			// put back on channeL???
-		}
-		fmt.Println("lolz kjorer")
-		time.Sleep(100 * time.Millisecond)
+	ThisMsgId++ // update msg Id somehow
+	numAcks := 0
+	numAcks++
+
+	// sjekke for Acks somehow
+	for {
+
+		// TIMEPOUT
+		// BREAK
 	}
-	fmt.Println("lolz ute m.", numAcks)
-	return numAcks
+
+	return false
 }

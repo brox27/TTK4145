@@ -15,30 +15,36 @@ const (
 	UP
 )
 
-type NewOrder struct {
-	MsgId  int
-	Floor  int
-	Button int
+type MsgType int
+
+const (
+	NEW MsgType = iota + 1
+	ACKNOWLEDGE
+	COMPLETE
+)
+
+type OrderMsg struct {
+	Floor   int
+	Button  int
+	MsgType int
 }
 
-type CompleteOrder struct {
-	MsgId  int
-	Floor  int
-	Button int
+const OrderState (
+	inactive
+	staged
+	active
+)
+type OrderStatus struct {
+	OrderState  int
+	AckdBy 		[]string
 }
 
-type Acknowledge struct {
-	MsgId int
-}
-
-type Heartbeat struct {
-	MsgId int
-}
 
 type Elev struct {
 	LastFloor int
 	Direction Direction
 	Orders    [Num_floors][Num_buttons]int
+	// bytte ut over med caborders
 	//id 			string
 }
 

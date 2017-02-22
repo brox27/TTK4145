@@ -34,7 +34,7 @@ func main() {
 			fmt.Println(err)
 			localIP = "DISCONNECTED"
 		}
-		id = fmt.Sprintf("peer-%s-%d", localIP, os.Getpid())
+		id = fmt.Sprintf("peer-%s-%d", localIP, os.Getpid()) // fjerne os Getpid  for å fjerne prosess id!!! %%%%%%%%%%%%%%%% SE HER UPDATE &&&&&&&&&&&&&&&&
 	}
 
 	// We make a channel for receiving updates on the id's of the peers that are
