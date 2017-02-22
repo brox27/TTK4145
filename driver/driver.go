@@ -3,8 +3,7 @@ package driver
 import (
 	. "../globals"
 	//. "fmt"
-	"runtime"
-	//"time"
+	"time"
 )
 
 type ButtonState int
@@ -22,7 +21,7 @@ const (
 	//TimedOut
 )
 
-func buttonPoll(buttonChan chan [2]int) {
+func ButtonPoll(buttonChan chan [2]int) {
 	ButtonMap := make(map[[2]int]ButtonState) //Ensures that each
 	for i := 0; i < N_BUTTONS; i++ {          //buttonpress is registered only once
 		for j := 1; j <= N_FLOORS; j++ {
@@ -47,6 +46,7 @@ func buttonPoll(buttonChan chan [2]int) {
 				}
 			}
 		}
+		time.Sleep(25 * time.Millisecond)
 	}
 }
 
@@ -57,13 +57,13 @@ func floorPoll(floorChan chan int) {
 }
 
 func EventHandler(eventChan chan map[Event]interface{}) {
-	runtime.GOMAXPROCS(runtime.NumCPU())
+
 	eventMap := make(map[Event]interface{}) //maps necessary data (value) to an event (key)
 
 	buttonChan := make(chan [2]int)
-
-	go buttonPoll(buttonChan)
+	go ButtonPoll(buttonChan)
 	buttonData := <-buttonChan
+
 	for {
 
 		data, ok := eventMap[ButtonPressed].([2]int)
@@ -107,7 +107,7 @@ func EventHandler(eventChan chan map[Event]interface{}) {
 				eventChan <- eventMap
 			}*/
 		//what else
-		buttonData = <-buttonChan
+		//buttonData = <-buttonChan
 	}
 
 }

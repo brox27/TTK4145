@@ -4,6 +4,7 @@ import (
 	. "./driver"
 	. "./globals"
 	. "fmt"
+	"runtime"
 	//"time"
 )
 
@@ -25,14 +26,15 @@ type Elevator struct {
 }
 
 func main() {
+	runtime.GOMAXPROCS(runtime.NumCPU())
 	InitElev()
 
 	eventChan := make(chan map[Event]interface{})
+
 	go EventHandler(eventChan)
 
 	for {
 		Println(<-eventChan)
-
 	}
 
 	defer SetMotorDirection(NEUTRAL)

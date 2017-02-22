@@ -10,6 +10,20 @@ import (
 	"time"
 )
 
+struct sendChan{
+	chan ConfigFile.NewOrder
+	chan ConfigFile.CompleteOrder
+	chan ConfigFile.Acknowledge
+	chan ConfigFile.Heartbeat
+}
+
+struct recieveChan{
+	chan ConfigFile.NewOrder
+	chan ConfigFile.CompleteOrder
+	chan ConfigFile.Acknowledge
+	chan ConfigFile.Heartbeat
+}
+
 func main() {
 
 	// setter opp -- aka Anders work
@@ -22,6 +36,7 @@ func main() {
 		}
 		id = fmt.Sprintf("peer-%s-%d", localIP, os.Getpid())
 	}
+
 	peerUpdateCh := make(chan peers.PeerUpdate)
 	peerTxEnable := make(chan bool)
 	go peers.Transmitter(15647, id, peerTxEnable)
@@ -32,6 +47,7 @@ func main() {
 	CompleteOrderRx := make(chan ConfigFile.CompleteOrder, 5)
 	AcknowledgeRx := make(chan ConfigFile.Acknowledge, 5)
 	HeartbeatRx := make(chan ConfigFile.Heartbeat, 5)
+
 	// < ALL ORDERS > \\
 
 	// Setter opp EGNE Send channels
@@ -42,17 +58,8 @@ func main() {
 	// < ALL ORDERS > \\
 
 	// setter opp alle rutinene for å sende..?
-	go bcast.Transmitter(16569, NewOrderTx)
-	go bcast.Receiver(16569, NewOrderRx)
-
-	go bcast.Transmitter(16569, CompleteOrderTx)
-	go bcast.Receiver(16569, CompleteOrderRx)
-
-	go bcast.Transmitter(16569, AcknowledgeTx)
-	go bcast.Receiver(16569, AcknowledgeRx)
-
-	go bcast.Transmitter(16569, HeartbeatTx)
-	go bcast.Receiver(16569, HeartbeatRx)
+	go bcast.Transmitter(16569, NewOrderTx, CompleteOrderTx, AcknowledgeTx, HeartbeatTx)
+	go bcast.Receiver(16569, NewOrderRx, CompleteOrderRx, AcknowledgeRx, HeartbeatRx)
 
 	time.Sleep(1 * time.Second)
 
@@ -60,39 +67,38 @@ func main() {
 	Sender(hest)
 }
 
+func Sender(data interface{}) bool {
+	ThisMsgId := 12 // sett ID på melding som sendes ut --> denne MÅ være dynamisk
 
-func Sender(data interface{}) int{
-	ThisMsgId := 12
-    switch t := data.(type) {
-        case ConfigFile.NewOrder:
-            fmt.Println("New Order")
+	switch t := data.(type) {
+	case ConfigFile.NewOrder:
+		fmt.Println("New Order")
 
-        case ConfigFile.CompleteOrder:
-            fmt.Println("CompleteOrder")
+	case ConfigFile.CompleteOrder:
+		fmt.Println("CompleteOrder")
 
-        case ConfigFile.Acknowledge:
-            fmt.Println("Acknowledge")
+	case ConfigFile.Acknowledge:
+		fmt.Println("Acknowledge")
 
-        case ConfigFile.Heartbeat:
-            fmt.Println("Heartbeat")
+	case ConfigFile.Heartbeat:
+		fmt.Println("Heartbeat")
 
-        default:
-            fmt.Printf("ERROR: Unknown type: %T", t)
-    }
-    ThisMsgId ++
+	default:
+		fmt.Printf("ERROR: Unknown type: %T", t)
+	}
+	
+	ThisMsgId++
+	numAcks := 0
 
-
-    numAcks := 0
-
-    for i:=0;i<100;i++{
-	    inncomming := ConfigFile.Acknowledge{}
-		if inncomming.MsgId == ThisMsgId{
-			numAcks ++
-		}else{
+	for i := 0; i < 100; i++ {
+		inncomming := ConfigFile.Acknowledge{}
+		if inncomming.MsgId == ThisMsgId {
+			numAcks++
+		} else {
 			// put back on channeL???
 		}
 		fmt.Println("lolz kjorer")
-		time.Sleep(100*time.Millisecond)
+		time.Sleep(100 * time.Millisecond)
 	}
 	fmt.Println("lolz ute m.", numAcks)
 	return numAcks
