@@ -14,25 +14,29 @@ func main() {
 	InitElev()
 	println(" ░░░░░░░░░░░░░░░░░░░░░ \n ░░░░░░░░░░░░▄▀▀▀▀▄░░░ \n ░░░░░░░░░░▄▀░░▄░▄░█░░ \n ░▄▄░░░░░▄▀░░░░▄▄▄▄█░░ \n █░░▀▄░▄▀░░░░░░░░░░█░░ \n ░▀▄░░▀▄░░░░█░░░░░░█░░ \n ░░░▀▄░░▀░░░█░░░░░░█░░ \n ░░░▄▀░░░░░░█░░░░▄▀░░░ \n ░░░▀▄▀▄▄▀░░█▀░▄▀░░░░░ \n ░░░░░░░░█▀▀█▀▀░░░░░░░ \n ░░░░░░░░▀▀░▀▀░░░░░░░░ \n")
 	runtime.GOMAXPROCS(runtime.NumCPU())
-//	localId := "123.123"
+	localId := "123.123"
 	
-	//eventChan := make(chan Event)
-//	go EventHandler(eventChan)
-//	RUN(localId)
-	Lala()
+
+	RUN(localId)
 }
 
 
 func RUN(localId string) {	// mulig localID kan/bør ligge i Config?, eventChan chan map[Event]interface{}
-	//State := INITIALIZE
+	State := INITIALIZE
+	eventChan := make(chan Event)
+	go EventHandler(eventChan)
 	hest := GetFloorSensorSignal()
 	println(hest)
-	/*
 	for {
 		select{
-		//case eventMap := <- eventChan:
+		case LOLL := <- eventChan:
 			//update based on what arrived
-		//	println("lolz")
+			println("lolz noe skjedde!")
+			if LOLL.EventType == NEWFLOOR{
+				println("new floor motherfucker!")
+			}else{
+				println("new button motherfucker")
+			}
 
 		default:
 			switch(State){
@@ -54,47 +58,42 @@ func RUN(localId string) {	// mulig localID kan/bør ligge i Config?, eventChan 
 				break
 
 			case IDLE:
-				/*nextDir := OrderManager.NextDirection()
-				if nextDir != IDLE{
+				nextDir := NEUTRAL 			// HARDCODED !!__________________________--
+				if nextDir != NEUTRAL{
 					SetMotorDirection(nextDir)
-					elev.State=RUNNING
+					State=RUNNING
 				}
 				break
 
 			case RUNNING:
-		/*
-				event arrived at floor
-					Oppdatere ny etg!
-					Oppdatere lys for etg.
-					if OrderManager.Shouldstop(){
-						SetMotorDirection(NEUTRAL)
+				//event arrived at floor
+				//	Oppdatere ny etg!
+				//	Oppdatere lys for etg.
+				//	if OrderManager.Shouldstop(){
+				//		SetMotorDirection(NEUTRAL)
 						//oppdatere direction?
 						//sette lys for dør åpen
 						// starte timer
 						//oppdatere orders lista
 						// si ordre utført! til andre
-						elev.State=DOORSOPEN
-				}
+						State=DOORSOPEN
 		
 
 			case DOORSOPEN:
-				/*
-				if TIMEOUT
-					Skru av timer?
-					Sett lys dør av
-					nextDir = OrderManager.GetNextOrder()
-					if nextDir == NEUTRAL{
-						elev.State=IDLE
-					}else{
-						setMotorDir(nextDir)
-						elev.State=RUNNING
-					}	
-			
 
+				//if TIMEOUT
+				//	Skru av timer?
+				//	Sett lys dør av
+				//	nextDir = OrderManager.GetNextOrder()
+				//	if nextDir == NEUTRAL{
+				//		elev.State=IDLE
+				//	}else{
+				//		setMotorDir(nextDir)
+				//		elev.State=RUNNING
+				//	}
 			}
 		}
 	}
-	*/
 
 	defer SetMotorDirection(NEUTRAL)
 }

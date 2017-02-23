@@ -13,12 +13,14 @@ import (
 	"fmt"
 )
 
-var LAMP_CHANNEL_MATRIX = [Num_floors][Num_buttons]int{{LIGHT_UP1, LIGHT_DOWN1, LIGHT_COMMAND1},
+var LAMP_CHANNEL_MATRIX = [Num_floors][Num_buttons]int{
+	{LIGHT_UP1, LIGHT_DOWN1, LIGHT_COMMAND1},
 	{LIGHT_UP2, LIGHT_DOWN2, LIGHT_COMMAND2},
 	{LIGHT_UP3, LIGHT_DOWN3, LIGHT_COMMAND3},
 	{LIGHT_UP4, LIGHT_DOWN4, LIGHT_COMMAND4}}
 
-var BUTTON_CHANNEL_MATRIX = [Num_floors][Num_buttons]int{{BUTTON_UP1, BUTTON_DOWN1, BUTTON_COMMAND1},
+var BUTTON_CHANNEL_MATRIX = [Num_floors][Num_buttons]int{
+	{BUTTON_UP1, BUTTON_DOWN1, BUTTON_COMMAND1},
 	{BUTTON_UP2, BUTTON_DOWN2, BUTTON_COMMAND2},
 	{BUTTON_UP3, BUTTON_DOWN3, BUTTON_COMMAND3},
 	{BUTTON_UP4, BUTTON_DOWN4, BUTTON_COMMAND4}}
@@ -86,18 +88,14 @@ func SetDoorOpenLamp(value int) {
 	}
 }
 
-func GetButtonSignal(button ButtonType, floor int) int {
-	if (Num_floors >= floor && floor > 0) && (0 <= button && button < Num_buttons) {
-		return Io_read_bit(BUTTON_CHANNEL_MATRIX[floor-1][button])
+func GetButtonSignal(floor int, button int) int {
+	if (floor>=0 && floor < Num_floors) && (button >= 0 && button < Num_buttons){
+		return Io_read_bit(BUTTON_CHANNEL_MATRIX[floor][button])
 	}
 	return 0
 }
 
 func GetFloorSensorSignal() int {
-	fmt.Printf("leser 1 til: %d\n", Io_read_bit(SENSOR_FLOOR1))
-	fmt.Printf("leser 2 til: %d\n", Io_read_bit(SENSOR_FLOOR2))
-	fmt.Printf("leser 3 til: %d\n", Io_read_bit(SENSOR_FLOOR3))
-	fmt.Printf("leser 4 til: %d\n", Io_read_bit(SENSOR_FLOOR4))
 	if Io_read_bit(SENSOR_FLOOR1) != 0 {
 		return 1
 	}

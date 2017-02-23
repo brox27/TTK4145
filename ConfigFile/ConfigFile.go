@@ -98,7 +98,7 @@ const (
 	RUNNING
 	DOORSOPEN
 )
-/*
+
 type EventType int
 const (
 	BUTTONPRESSED = iota
@@ -110,4 +110,3 @@ type Event struct{
 	Floor int
 	Button int
 }
-*/
