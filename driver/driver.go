@@ -1,7 +1,8 @@
 package driver
 
 import (
-	. "../globals"
+	//. "../globals"
+	. "../ConfigFile"
 	//. "fmt"
 	"time"
 )
@@ -23,24 +24,24 @@ const (
 
 func ButtonPoll(buttonChan chan [2]int) {
 	ButtonMap := make(map[[2]int]ButtonState) //Ensures that each
-	for i := 0; i < N_BUTTONS; i++ {          //buttonpress is registered only once
-		for j := 1; j <= N_FLOORS; j++ {
+	for i := 0; i < Num_buttons; i++ {          //buttonpress is registered only once
+		for j := 1; j <= Num_floors; j++ {
 			ButtonMap[[2]int{i, j}] = RELEASED
 		}
 	}
 
 	for {
-		for i := 0; i < N_BUTTONS; i++ {
-			for j := 1; j <= N_FLOORS; j++ {
-				if (GetButtonSignal(ButtonType(i), j) == 1) && (ButtonMap[[2]int{i, j}] != Pressed) {
+		for i := 0; i < Num_buttons; i++ {
+			for j := 1; j <= Num_floors; j++ {
+				if (GetButtonSignal(ButtonType(i), j) == 1) && (ButtonMap[[2]int{i, j}] != PRESSED) {
 					buttonChan <- [2]int{i, j}
 					ButtonMap[[2]int{i, j}] = PRESSED
 				}
 			}
 		}
 
-		for i := 0; i < N_BUTTONS; i++ {
-			for j := 1; j <= N_FLOORS; j++ {
+		for i := 0; i < Num_buttons; i++ {
+			for j := 1; j <= Num_floors; j++ {
 				if GetButtonSignal(ButtonType(i), j) == 0 {
 					ButtonMap[[2]int{i, j}] = RELEASED
 				}
@@ -66,7 +67,7 @@ func EventHandler(eventChan chan map[Event]interface{}) {
 
 	for {
 
-		data, ok := eventMap[ButtonPressed].([2]int)
+		data, ok := eventMap[BUTTON_PRESSED].([2]int)
 
 		if !ok {
 			eventMap[BUTTON_PRESSED] = buttonData
@@ -88,7 +89,7 @@ func EventHandler(eventChan chan map[Event]interface{}) {
 
 		floor := GetFloorSensorSignal()
 
-		data2, ok2 := eventMap[NewFloor].(int)
+		data2, ok2 := eventMap[NEW_FLOOR].(int)
 
 		if !ok2 {
 			eventMap[NEW_FLOOR] = floor

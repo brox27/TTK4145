@@ -103,16 +103,21 @@ func GetButtonSignal(button ButtonType, floor int) int {
 }
 
 func GetFloorSensorSignal() int {
+
 	if Io_read_bit(SENSOR_FLOOR1) != 0 {
+		fmt.Printf("lala land\n")
 		return 1
 	}
 	if Io_read_bit(SENSOR_FLOOR2) != 0 {
+		fmt.Printf("lala land\n")
 		return 2
 	}
 	if Io_read_bit(SENSOR_FLOOR3) != 0 {
+		fmt.Printf("lala land\n")
 		return 3
 	}
 	if Io_read_bit(SENSOR_FLOOR4) != 0 {
+		fmt.Printf("lala land\n")
 		return 4
 	} else {
 		return -1
