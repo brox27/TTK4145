@@ -27,6 +27,8 @@ func RUN(localId string) {	// mulig localID kan/bør ligge i Config?, eventChan 
 	go EventHandler(eventChan)
 	hest := GetFloorSensorSignal()
 	println(hest)
+
+	EventFloor := false
 	for {
 		select{
 		case LOLL := <- eventChan:
@@ -34,6 +36,8 @@ func RUN(localId string) {	// mulig localID kan/bør ligge i Config?, eventChan 
 			println("lolz noe skjedde!")
 			if LOLL.EventType == NEWFLOOR{
 				println("new floor motherfucker!")
+				// OPPDATERE egen variable på FLOOR!
+				EventFloor = true
 			}else{
 				println("new button motherfucker")
 			}
@@ -49,6 +53,7 @@ func RUN(localId string) {	// mulig localID kan/bør ligge i Config?, eventChan 
 					// synkronisere ordre mot andre på nettverket!
 
 					// WaitGroup e.l.? for å være sikker på klar
+					// er det en ide å starte eventHandler her..? så vi ikke tar inn knappetrykk eller no shit før klar?
 					State=IDLE
 
 					break
@@ -58,7 +63,7 @@ func RUN(localId string) {	// mulig localID kan/bør ligge i Config?, eventChan 
 				break
 
 			case IDLE:
-				nextDir := NEUTRAL 			// HARDCODED !!__________________________--
+				nextDir := DOWN 			// HARDCODED !!___________________________________________________________________________________ <-- SE!
 				if nextDir != NEUTRAL{
 					SetMotorDirection(nextDir)
 					State=RUNNING
@@ -66,6 +71,13 @@ func RUN(localId string) {	// mulig localID kan/bør ligge i Config?, eventChan 
 				break
 
 			case RUNNING:
+				if EventFloor{
+					SetFloorLight(GetFloorSensorSignal()-1)
+					EventFloor = false
+					//HVIS SKAL STOPPE
+					SetMotorDirection(NEUTRAL)
+					State=DOORSOPEN
+				}
 				//event arrived at floor
 				//	Oppdatere ny etg!
 				//	Oppdatere lys for etg.
@@ -76,7 +88,7 @@ func RUN(localId string) {	// mulig localID kan/bør ligge i Config?, eventChan 
 						// starte timer
 						//oppdatere orders lista
 						// si ordre utført! til andre
-						State=DOORSOPEN
+						
 		
 
 			case DOORSOPEN:

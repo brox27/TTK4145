@@ -9,3 +9,9 @@ Har laget en FSMbrox som jeg tror er ganske sweet, i tillegg laget en mappe "dri
 Button: Når en button blir presset, dvs at den må slippes og så trykkes inn på nytt for å sende. Sjekker ikke om den "lyser" eller tilsvarende bare om den er holdt inne siden sist vi "loopet" forbi den knappen
 
 NewFloor: Når den kommer til en etg. etter å ha vært i "etg" "-1". 
+
+Fjernet også set dir o.l fra Elev_int (?) da dette blir dekket i case INITIALIZE i fsmen -> om vi ikke bruker denne FSMen så må det sees på!
+
+i FSM brukes en bool for å si fra om vi er annkommet ny etg. --> kan gjøres smidigere tror jeg
+
+- BROX
