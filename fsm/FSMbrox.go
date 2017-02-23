@@ -6,24 +6,28 @@ import (
 //	"../OrderManager"
 	. "../ConfigFile"
 	//. "fmt"
-//	"runtime"
+	"runtime"
 	//"time"
 )
 
 func main() {
-//	println(" ░░░░░░░░░░░░░░░░░░░░░ \n ░░░░░░░░░░░░▄▀▀▀▀▄░░░ \n ░░░░░░░░░░▄▀░░▄░▄░█░░ \n ░▄▄░░░░░▄▀░░░░▄▄▄▄█░░ \n █░░▀▄░▄▀░░░░░░░░░░█░░ \n ░▀▄░░▀▄░░░░█░░░░░░█░░ \n ░░░▀▄░░▀░░░█░░░░░░█░░ \n ░░░▄▀░░░░░░█░░░░▄▀░░░ \n ░░░▀▄▀▄▄▀░░█▀░▄▀░░░░░ \n ░░░░░░░░█▀▀█▀▀░░░░░░░ \n ░░░░░░░░▀▀░▀▀░░░░░░░░ \n")
-//	runtime.GOMAXPROCS(runtime.NumCPU())
+	InitElev()
+	println(" ░░░░░░░░░░░░░░░░░░░░░ \n ░░░░░░░░░░░░▄▀▀▀▀▄░░░ \n ░░░░░░░░░░▄▀░░▄░▄░█░░ \n ░▄▄░░░░░▄▀░░░░▄▄▄▄█░░ \n █░░▀▄░▄▀░░░░░░░░░░█░░ \n ░▀▄░░▀▄░░░░█░░░░░░█░░ \n ░░░▀▄░░▀░░░█░░░░░░█░░ \n ░░░▄▀░░░░░░█░░░░▄▀░░░ \n ░░░▀▄▀▄▄▀░░█▀░▄▀░░░░░ \n ░░░░░░░░█▀▀█▀▀░░░░░░░ \n ░░░░░░░░▀▀░▀▀░░░░░░░░ \n")
+	runtime.GOMAXPROCS(runtime.NumCPU())
 //	localId := "123.123"
-//	InitElev()
-//	eventChan := make(chan Event)
+	
+	//eventChan := make(chan Event)
 //	go EventHandler(eventChan)
-//	RUN(localId, eventChan)
+//	RUN(localId)
 	Lala()
 }
 
 
-func RUN(localId string, eventChan chan map[Event]interface{}) {	// mulig localID kan/bør ligge i Config?
-	State := INITIALIZE
+func RUN(localId string) {	// mulig localID kan/bør ligge i Config?, eventChan chan map[Event]interface{}
+	//State := INITIALIZE
+	hest := GetFloorSensorSignal()
+	println(hest)
+	/*
 	for {
 		select{
 		//case eventMap := <- eventChan:
@@ -54,7 +58,7 @@ func RUN(localId string, eventChan chan map[Event]interface{}) {	// mulig localI
 				if nextDir != IDLE{
 					SetMotorDirection(nextDir)
 					elev.State=RUNNING
-				}*/
+				}
 				break
 
 			case RUNNING:
@@ -71,7 +75,7 @@ func RUN(localId string, eventChan chan map[Event]interface{}) {	// mulig localI
 						// si ordre utført! til andre
 						elev.State=DOORSOPEN
 				}
-		*/
+		
 
 			case DOORSOPEN:
 				/*
@@ -85,11 +89,12 @@ func RUN(localId string, eventChan chan map[Event]interface{}) {	// mulig localI
 						setMotorDir(nextDir)
 						elev.State=RUNNING
 					}	
-			*/
+			
 
 			}
 		}
 	}
+	*/
 
 	defer SetMotorDirection(NEUTRAL)
 }

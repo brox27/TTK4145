@@ -3,6 +3,7 @@ package driver
 import (
 	. "../ConfigFile"
 	"time"
+	"fmt"
 )
 
 type ButtonState int
@@ -55,12 +56,13 @@ func EventHandler(eventChan chan Event) {
 */
 
 func Lala(){
-	println("KUN TEST!")
+	fmt.Printf("KUN TEST!\n")
+	kujkk := Num_buttons
+	kujkk ++
 	for{
-		hesten := GetFloorSensorSignal()
-		if hesten != -1{
-			println(hesten)
-		}
+		GetFloorSensorSignal()
+		fmt.Printf(" -- \n")
+		time.Sleep(1*time.Second)
 	}
-	time.Sleep(Num_floors*time.Second)
+	
 }

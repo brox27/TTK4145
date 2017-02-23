@@ -34,19 +34,10 @@ func InitElev() {
 		}
 	}
 
-	if(GetFloorSensorSignal()==-1){
-			SetMotorDirection(DOWN)
-	}
-	for{
-		if(GetFloorSensorSignal()!=-1){
-			SetMotorDirection(NEUTRAL)
-			break
-		}
-	}
-
 	SetStopLamp(0)
 	SetDoorOpenLamp(0)
 	SetFloorLight(0)
+	fmt.Printf("init done \n")
 }
 
 func SetMotorDirection(dir Direction) {
@@ -103,21 +94,20 @@ func GetButtonSignal(button ButtonType, floor int) int {
 }
 
 func GetFloorSensorSignal() int {
-
+	fmt.Printf("leser 1 til: %d\n", Io_read_bit(SENSOR_FLOOR1))
+	fmt.Printf("leser 2 til: %d\n", Io_read_bit(SENSOR_FLOOR2))
+	fmt.Printf("leser 3 til: %d\n", Io_read_bit(SENSOR_FLOOR3))
+	fmt.Printf("leser 4 til: %d\n", Io_read_bit(SENSOR_FLOOR4))
 	if Io_read_bit(SENSOR_FLOOR1) != 0 {
-		fmt.Printf("lala land\n")
 		return 1
 	}
 	if Io_read_bit(SENSOR_FLOOR2) != 0 {
-		fmt.Printf("lala land\n")
 		return 2
 	}
 	if Io_read_bit(SENSOR_FLOOR3) != 0 {
-		fmt.Printf("lala land\n")
 		return 3
 	}
-	if Io_read_bit(SENSOR_FLOOR4) != 0 {
-		fmt.Printf("lala land\n")
+	if Io_read_bit(SENSOR_FLOOR4 ) != 0 {
 		return 4
 	} else {
 		return -1
