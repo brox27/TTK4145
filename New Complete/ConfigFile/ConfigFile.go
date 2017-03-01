@@ -25,9 +25,6 @@ const (
 	BUTTON_ORDER_COMMAND
 )
 
-
-
-
 type MsgType int
 
 const (
@@ -42,8 +39,7 @@ type OrderMsg struct {
 	MsgType int
 }
 
-
-var ELEVATOR_IPS=[NUM_ELEVATORS]string{"123.123.123","321.321.321","asd.asd.asd"}
+var ELEVATOR_IPS = [NUM_ELEVATORS]string{"123.123.123", "321.321.321", "asd.asd.asd"}
 
 type OrderState int
 
@@ -54,30 +50,30 @@ type OrderState int
 }
 */
 
-const (	//OrderState 
-	Default OrderState = iota +1
+const ( //OrderState
+	Default OrderState = iota + 1
 	Inactive
 	PendingAck
 	Active
 )
 
 type OrderStatus struct {
-	OrderState  OrderState
-	AckdBy 		[]string
+	OrderState OrderState
+	AckdBy     []string
 }
 
-type AllHallOrders struct{
-	HallOrders [Num_floors][(Num_buttons-1)] OrderStatus
+type AllHallOrders struct {
+	HallOrders [Num_floors][(Num_buttons - 1)]OrderStatus
 }
 
-type CabOrders struct{
-	CabOrders [Num_floors] OrderStatus
+type CabOrders struct {
+	CabOrders [Num_floors]OrderStatus
 	Direction Direction
-	Floor int
+	Floor     int
 }
-
 
 type Elev struct {
+	State     State
 	LastFloor int
 	Direction Direction
 	Orders    [Num_floors][Num_buttons]int
@@ -88,10 +84,10 @@ type Elev struct {
 var AllOrders map[string]*Elev
 var AllCabOrders map[string]*CabOrders
 
-
 // med ny fsm
 
 type States int
+
 const (
 	INITIALIZE States = iota
 	IDLE
@@ -100,13 +96,36 @@ const (
 )
 
 type EventType int
+
 const (
 	BUTTONPRESSED = iota
 	NEWFLOOR
 )
 
-type Event struct{
+type Event struct {
 	EventType EventType
-	Floor int
-	Button int
+	Floor     int
+	Button    int
+}
+
+/////// ANDERS FIXES!! /////// /////// /////// /////// /////// /////// /////// /////// /////// ///////
+/*
+type State struct {
+	Floor     int
+	Direction Direction
+	State     States
+}*/
+
+type PeerUpdate struct {
+	Peers []string
+	New   string
+	Lost  []string
+}
+
+type ConsensusCab struct {
+	CabButtons [Num_floors]OrderState
+}
+
+type ConsensusHall struct {
+	HallButtons [Num_floors][Num_buttons - 1]OrderState
 }
