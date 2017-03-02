@@ -13,8 +13,8 @@ type Direction int
 
 const (
 	UP Direction = iota
-	DOWN 					
-	NEUTRAL 			
+	DOWN
+	NEUTRAL
 )
 
 type ButtonType int
@@ -32,60 +32,23 @@ const (
 	ACKNOWLEDGE
 	COMPLETE
 )
- 
+
 type OrderMsg struct {
 	Floor   int
 	Button  int
 	MsgType int
-} 
+}
 
 var ELEVATOR_IPS = [NUM_ELEVATORS]string{"123.123.123", "321.321.321", "asd.asd.asd"}
 
-
-
-type AllHallOrders struct {
-	HallOrders [Num_floors][(Num_buttons - 1)]OrderStatus
-}
-
-type CabOrders struct {
-	CabOrders [Num_floors]OrderStatus
-	Direction Direction
-	Floor     int
-}
-
-var AllOrders map[string]*Elev
-
-var AllCabOrders map[string]*CabOrders
-
-// med ny fsm
-
-/////// ANDERS FIXES!! /////// /////// /////// /////// /////// /////// /////// /////// /////// ///////
-const Port = 15647
-
-type States int
-
-const (
-	INITIALIZE States = iota
-	IDLE							
-	RUNNING							
-	DOORSOPEN						
-)
-
-type Elev struct {
-	State     	States				`json:"hallRequests"`
-	Floor    	int 				`json:"floor"`
-	Direction 	Direction			`json:"direction"`
-	CabOrders   [Num_floors]bool	`json:"cabRequests"`
-	Orders 		[Num_floors][Num_buttons]bool
-}
-
-type PeerUpdate struct {
-	Peers []string
-	New   string
-	Lost  []string
-}
-
 type OrderState int
+
+/*interface merge{
+	LocalID string
+	RemoteID string
+	Peers[] string
+}
+*/
 
 const ( //OrderState
 	Default OrderState = iota + 1
@@ -99,10 +62,70 @@ type OrderStatus struct {
 	AckdBy     []string
 }
 
+type AllHallOrders struct {
+	HallOrders [Num_floors][(Num_buttons - 1)]OrderStatus
+}
+
+type CabOrders struct {
+	CabOrders [Num_floors]OrderStatus
+	Direction Direction
+	Floor     int
+}
+
+type Elev struct {
+	State     State
+	LastFloor int
+	Direction Direction
+	Orders    [Num_floors][Num_buttons]int
+	// bytte ut over med caborders
+	//id 			string
+}
+
+var AllOrders map[string]*Elev
+var AllCabOrders map[string]*CabOrders
+
+// med ny fsm
+
+type States int
+
+const (
+	INITIALIZE States = iota
+	IDLE
+	RUNNING
+	DOORSOPEN
+)
+
+type EventType int
+
+const (
+	BUTTONPRESSED = iota
+	NEWFLOOR
+)
+
+type Event struct {
+	EventType EventType
+	Floor     int
+	Button    int
+}
+
+/////// ANDERS FIXES!! /////// /////// /////// /////// /////// /////// /////// /////// /////// ///////
+/*
+type State struct {
+	Floor     int
+	Direction Direction
+	State     States
+}*/
+
+type PeerUpdate struct {
+	Peers []string
+	New   string
+	Lost  []string
+}
+
 type ConsensusCab struct {
-	CabButtons [Num_floors]OrderStatus
+	CabButtons [Num_floors]OrderState
 }
 
 type ConsensusHall struct {
-	HallButtons [Num_floors][Num_buttons - 1]OrderStatus
+	HallButtons [Num_floors][Num_buttons - 1]OrderState
 }

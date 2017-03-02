@@ -7,7 +7,7 @@ import (
 	//	. "../OrderManager"
 	//. "fmt"
 	//	"runtime"
-	//"time"
+	"time"
 )
 
 /*
@@ -38,7 +38,7 @@ func RUN(FloorChan chan int, StateChan chan ConfigFile.Elev, LocalOrdersChan cha
 	//	hest := GetFloorSensorSignal()
 	//	println(hest)
 	LocalElev := ConfigFile.Elev{}
-
+//	timerChan := make(chan int)
 	for {
 		select {
 		case newFloor := <-FloorChan:
@@ -58,7 +58,6 @@ func RUN(FloorChan chan int, StateChan chan ConfigFile.Elev, LocalOrdersChan cha
 					LocalElev.State = ConfigFile.IDLE
 					LocalElev.Direction = ConfigFile.NEUTRAL
 					StateChan <- LocalElev
-
 					break
 				} else {
 					SetMotorDirection(ConfigFile.DOWN) // sjekke noe så den ikke "settes" så ofte?
@@ -82,6 +81,7 @@ func RUN(FloorChan chan int, StateChan chan ConfigFile.Elev, LocalOrdersChan cha
 				if shouldStop(LocalElev) {
 					SetMotorDirection(ConfigFile.NEUTRAL)
 					// Starte timer
+					//go timer(timerChan)
 					SetDoorOpenLamp(1)
 					// Oppdatere mtp ordre ferdig
 					LocalElev.State = ConfigFile.DOORSOPEN
@@ -90,18 +90,13 @@ func RUN(FloorChan chan int, StateChan chan ConfigFile.Elev, LocalOrdersChan cha
 				}
 
 			case ConfigFile.DOORSOPEN:
-				/*
-					if TIMEOUT{											// LAG TIMEOUT
-						Skru av timer?
-						elev.SetDoorOpenLamp(0)
-						nextDir = nextDirection(LocalElev)
-						if nextDir == NEUTRAL{
-							LocalElev.State=IDLE
-						}else{
-							elev.SetMotorDirection(nextDir)
-							LocalElev.State=RUNNING
-					}
-				*/
+			//	select{
+				//case <- timerChan:
+			//		SetDoorOpenLamp(0)
+			//		LocalElev.State = ConfigFile.IDLE
+			//	default:
+			//		continue
+			//	}
 			}
 		}
 	}
@@ -181,4 +176,9 @@ func shouldStop(LocalElev ConfigFile.Elev) bool {
 		}
 	}
 	return false
+}
+
+func timer(timerChan chan int){
+	time.Sleep(3*time.Second)
+	timerChan<-1
 }

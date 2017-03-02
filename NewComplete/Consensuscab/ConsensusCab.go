@@ -2,7 +2,7 @@ package Consensuscab
 
 import (
 	"../ConfigFile"
-	"fmt"
+	//"fmt"
 )
 
 /*
@@ -13,7 +13,9 @@ func main() {
 }
 */
 
-func ConsensusCab() {
+func ConsensusCab(ClearCabOrderChan chan int, ConsensusCabChan chan map[string]*ConfigFile.ConsensusCab, CabButtonChan chan int, PeerUpdateChan chan ConfigFile.PeerUpdate ) {
+	LocalID:="123"
+	RemoteID :="321"
 	// DEBUG SHIT!
 	/*
 		newOrderConsensus := make(chan ConfigFile.OrderMsg, 9)      // denne går TIL (FSM?) og bør lagres der og tatt inn som argument
@@ -25,25 +27,23 @@ func ConsensusCab() {
 		ConfigFile.AllCabOrders[LocalID] = &newElev
 		ConfigFile.AllCabOrders[LocalID].Floor = 3
 	*/
-	cabOrdersRx := make(chan map[string]*ConfigFile.CabOrders)
+	cabOrdersRx := make(chan map[string]*ConfigFile.ConsensusCab)
 	// BEM EM IN SCUTTY
-	// hallordersTx := make(chan ConfigFile.AllHallOrders)						// REMEMBER TO USE
+	// cabordersTx := make(chan ConfigFile.AllHallOrders)						// REMEMBER TO USE
 	// BEM EM UP SCUTTY
 
 	var AllCabOrders map[string]*ConfigFile.ConsensusCab
-	thisCab := ConfigFile.ConsensusCab
-	allCabOrders[LocalID] = &thisCab
-	LocalID := "123"
-	RemoteID := "321"
+	thisCab := ConfigFile.ConsensusCab{}
+	AllCabOrders[LocalID] = &thisCab
 	for {
 		select {
 		case remoteCabConsensus := <-cabOrdersRx:
-			for elevator := range remoteCabConsensus { // kan det bli "kræsj" med lengden på "local" og "remote"...?
+			for elevID := range remoteCabConsensus { // kan det bli "kræsj" med lengden på "local" og "remote"...?
 				for floor := 0; floor < ConfigFile.Num_floors; floor++ {
 
-					remote := remoteCabConsensus[elevator].ConsensusCab[floor]
-					local := AllCabOrders[elevator].ConsensusCab[floor]
-					merge(&local, remote, LocalID, RemoteID)
+					remote := remoteCabConsensus[elevID].CabButtons[floor]
+					local := AllCabOrders[elevID].CabButtons[floor]
+					merge(&local, remote, LocalID, RemoteID, floor)	// usikker på om denne trenger å vite Floor
 
 				}
 			}
@@ -53,7 +53,7 @@ func ConsensusCab() {
 	}
 }
 
-func merge(local *ConfigFile.OrderStatus, remote ConfigFile.OrderStatus, LocalID string, RemoteID string) {
+func merge(local *ConfigFile.OrderStatus, remote ConfigFile.OrderStatus, LocalID string, RemoteID string, floor int) {
 	switch local.OrderState {
 	case ConfigFile.Default:
 		if RemoteID != LocalID {
@@ -66,15 +66,12 @@ func merge(local *ConfigFile.OrderStatus, remote ConfigFile.OrderStatus, LocalID
 				break
 			case ConfigFile.PendingAck:
 				local.OrderState = ConfigFile.PendingAck
-				local.AckdBy = append(local.AckdBy, LocalID)
+				local.AckdBy = append(local.AckdBy, LocalID)		// bør det være local.AckdBy = append(remote.AckdBy, LocalID) her?
 				break
 			case ConfigFile.Active:
 				local.OrderState = ConfigFile.Active
-				local.AckdBy = append(local.AckdBy, LocalID)
-				//onActive() // usikker på hvordan dette kan oversettes til golang
-				varible := ConfigFile.OrderMsg{}
-				varible.Floor = floor
-				newOrderConsensus <- varible
+				local.AckdBy = append(local.AckdBy, LocalID) 		// bør det være local.AckdBy = append(remote.AckdBy, LocalID) her?
+				//onActive() // usikker på hvordan dette kan oversettes til golang ** onActive -> i Hall
 			}
 		}
 
@@ -85,7 +82,7 @@ func merge(local *ConfigFile.OrderStatus, remote ConfigFile.OrderStatus, LocalID
 
 		case ConfigFile.PendingAck:
 			local.OrderState = remote.OrderState
-			local.AckdBy = append(local.AckdBy, LocalID) //sett inn IP/ID
+			local.AckdBy = append(remote.AckdBy, LocalID) //sett inn IP/ID
 			break
 
 		case ConfigFile.Active:
@@ -100,18 +97,14 @@ func merge(local *ConfigFile.OrderStatus, remote ConfigFile.OrderStatus, LocalID
 
 		case ConfigFile.PendingAck:
 			// ADD all others ACKed to local
-
 			if len(local.AckdBy) == 3 { // denne må selvsagt byttes til en "dynamisk" sak, og ikke bare sjekker antall!
 				local.OrderState = ConfigFile.Active
-				varible := ConfigFile.OrderMsg{}
-				varible.Floor = floor
-				newOrderConsensus <- varible
-
+				// onACTIVE!!
 			}
 			break
 		case ConfigFile.Active:
 			local.OrderState = ConfigFile.Active
-			//local.AckdBy
+			local.AckdBy = append(remote.AckdBy, LocalID)
 			break
 
 		}
@@ -121,16 +114,13 @@ func merge(local *ConfigFile.OrderStatus, remote ConfigFile.OrderStatus, LocalID
 		case ConfigFile.Inactive:
 			local.OrderState = remote.OrderState
 			local.AckdBy = local.AckdBy[:0] // destroy
-			varible := ConfigFile.OrderMsg{}
-			varible.Floor = floor
-			completeOrderConsensus <- varible
 			break
 
 		case ConfigFile.PendingAck:
 			break
 
 		case ConfigFile.Active:
-			// Anders har appendet IP til ACked by her også... why? eller ser Why, men er det nødvendig?
+			local.AckdBy = append(remote.AckdBy, LocalID)
 			break
 
 		}
