@@ -32,13 +32,14 @@ func main() {
 */
 
 // 	ClearHallOrderChan chan []int, ClearCabOrderChan chan int)
-func RUN(FloorChan chan int, StateChan chan ConfigFile.Elev, LocalOrdersChan chan [ConfigFile.Num_floors][ConfigFile.Num_buttons]bool) {
-	//	State := INITIALIZE
-	//	go EventHandler(eventChan)
-	//	hest := GetFloorSensorSignal()
-	//	println(hest)
+func RUN(
+		FloorChan chan int, StateChan chan ConfigFile.Elev,
+ 		LocalOrdersChan chan [ConfigFile.Num_floors][ConfigFile.Num_buttons]bool,
+ 		ClearHallOrdersChan chan [2]int, ClearCabOrderChan chan int) {
+	
 	LocalElev := ConfigFile.Elev{}
-//	timerChan := make(chan int)
+
+	timerChan := make(chan int)
 	for {
 		select {
 		case newFloor := <-FloorChan:
@@ -71,32 +72,38 @@ func RUN(FloorChan chan int, StateChan chan ConfigFile.Elev, LocalOrdersChan cha
 					LocalElev.Direction = nextDirection(LocalElev)
 					StateChan <- LocalElev
 				}
-				if shouldStop(LocalElev) {
-					LocalElev.State = ConfigFile.DOORSOPEN
-					// oppdatere ORDER COMPLETE!
-				}
+			//	if shouldStop(LocalElev) {
+			//		LocalElev.State = ConfigFile.DOORSOPEN
+					// sjekke hvilken type ordre -> consensusCab el. -> consensusHall
+					// <- clearCabOrderChan eller <- clearHallOrderChan
+		//		}
 				break
 
 			case ConfigFile.RUNNING:
-				if shouldStop(LocalElev) {
+				if shouldStop(LocalElev) {									// se over, kan ha noen mangler, eks. når heisen allerede står i etg hvor det bestilles
+					for button := 0; button<ConfigFile.Num_buttons; button++{
+						if (LocalElev.Orders[LocalElev.Floor][button]){
+							if button<ConfigFile.Num_buttons-1{
+								ClearHallOrdersChan<-[2]int{LocalElev.Floor, button}
+							} else{
+								ClearCabOrderChan<-LocalElev.Floor
+							}
+						}
+					}
 					SetMotorDirection(ConfigFile.NEUTRAL)
-					// Starte timer
-					//go timer(timerChan)
+					go timer(timerChan)
 					SetDoorOpenLamp(1)
-					// Oppdatere mtp ordre ferdig
 					LocalElev.State = ConfigFile.DOORSOPEN
 					StateChan <- LocalElev
 					break
 				}
 
 			case ConfigFile.DOORSOPEN:
-			//	select{
-				//case <- timerChan:
-			//		SetDoorOpenLamp(0)
-			//		LocalElev.State = ConfigFile.IDLE
-			//	default:
-			//		continue
-			//	}
+				temp := <-timerChan
+				_ = temp
+				SetDoorOpenLamp(0)
+				LocalElev.State = ConfigFile.IDLE
+				break
 			}
 		}
 	}

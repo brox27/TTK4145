@@ -8,7 +8,7 @@ import (
 	"./FSM"
 	"./driver"
 	"./ElevatorStates"
-//	"./Peers"
+	"./Peers"
 	"./HallRequestAssigner"
 )
 
@@ -22,10 +22,10 @@ func main() {
 	ClearCabOrderChan := make(chan int)										// Fra FSM.go til ConsensusCab
 	StateChan := make(chan ConfigFile.Elev)									// Fra FSM.go til StateFileNotYetMade
 	PeerUpdateChan := make(chan ConfigFile.PeerUpdate)						// Fra "egen NW modul fra Anders" Til ConsHall/ConsCab/HallReqAss
-	//	ButtonLightsChan := make(chan [2]int) // evt. struct -> se hva som blir "lettest" å lettest  FUNKSJONSKALL!!!!!
 	ConsensusCabChan := make(chan map[string]*ConfigFile.ConsensusCab)		// Fra ConsensusCab til HallReqAss
 	ConsensusHallChan := make(chan ConfigFile.ConsensusHall)			// Fra ConsensusHall til HallReqAss
-	ElevatorStatesChan := make(chan map[string]*ConfigFile.Elev)		// Fra ElevatorStates til HallReqAss
+	ElevatorStatesChan := make(chan map[string]*ConfigFile.Elev)	
+	TransmitEnable := make(chan bool)	// Fra ElevatorStates til HallReqAss
 	//NewOrderConsensusChan := make(chan ConfigFile.OrderMsg)				// Fnot sure...
 
 	LocalOrdersChan := make(chan [ConfigFile.Num_floors][ConfigFile.Num_buttons]bool)	// Fra HallReqAss til FSM.go
@@ -34,12 +34,13 @@ func main() {
 	// ** starte GO routines ** \\
 	go driver.ButtonPoll(HallButtonChan, CabButtonChan)
 	go driver.FloorPoll(FloorChan)
-	go FSM.RUN(FloorChan, StateChan, LocalOrdersChan)
+	go FSM.RUN(FloorChan, StateChan, LocalOrdersChan, ClearHallOrderChan, ClearCabOrderChan)
 	go Consensushall.ConsensusHall(ClearHallOrderChan, HallButtonChan, PeerUpdateChan)
 	go Consensuscab.ConsensusCab(ClearCabOrderChan, ConsensusCabChan, CabButtonChan, PeerUpdateChan)
 	go ElevatorStates.DoSomethingSmart(StateChan, ElevatorStatesChan)
 	go HallRequestAssigner.HallReq(ConsensusHallChan, ConsensusCabChan, ElevatorStatesChan, LocalOrdersChan)
-//	go Peers.Receiver(ConfigFile.Port, PeerUpdateChan)
+	go Peers.Transmitter(ConfigFile.Port, "123", TransmitEnable)
+	go Peers.Receiver(ConfigFile.Port, PeerUpdateChan)
 
 
 

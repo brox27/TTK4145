@@ -2,20 +2,21 @@ package Consensushall
 
 import (
 	"../ConfigFile"
+	. "../Network"
 	//	"fmt"
 )
 
 var localHallConsensus ConfigFile.ConsensusHall
 
 func ConsensusHall(ClearHallOrderChan chan [2]int, HallButtonChan chan [2]int, PeerUpdateChan chan ConfigFile.PeerUpdate) {
-	// TIL FRA NETTVERK ********
 	hallordersRx := make(chan ConfigFile.ConsensusHall)
-	// BEM EM IN SCUTTY
-	// hallordersTx := make(chan ConfigFile.AllHallOrders)						// REMEMBER TO USE
-	// BEM EM UP SCUTTY
-	// ********
+	hallordersTx := make(chan ConfigFile.AllHallOrders)
+	go Transmitter(ConfigFile.Port, hallordersTx)
+	go Receiver(ConfigFile.Port, hallordersRx)
+
 	RemoteID := "123"
 	LocalID := "321"
+	var LivingPeers []string
 	for {
 		select {
 		case remoteHallConsensus := <-hallordersRx:
@@ -24,9 +25,11 @@ func ConsensusHall(ClearHallOrderChan chan [2]int, HallButtonChan chan [2]int, P
 
 					local := localHallConsensus.HallButtons[floor][button]
 					remote := remoteHallConsensus.HallButtons[floor][button]
-					merge(&local, remote, LocalID, RemoteID) // sette til å oppdatere local også!!!
+					merge(&local, remote, LocalID, RemoteID, LivingPeers) // sette til å oppdatere local også!!!
 				}
 			}
+		case PeerUpdate := <- PeerUpdateChan:
+			LivingPeers = PeerUpdate.Peers
 		default:
 			break
 		}
@@ -40,7 +43,7 @@ func doostuff(onActive func(), onInactive func()) {
 }
 */
 
-func merge(local *ConfigFile.OrderStatus, remote ConfigFile.OrderStatus, LocalID string, RemoteID string) {
+func merge(local *ConfigFile.OrderStatus, remote ConfigFile.OrderStatus, LocalID string, RemoteID string, LivingPeers []string ) {
 
 	switch local.OrderState {
 
@@ -55,7 +58,7 @@ func merge(local *ConfigFile.OrderStatus, remote ConfigFile.OrderStatus, LocalID
 				break
 			case ConfigFile.PendingAck:
 				local.OrderState = ConfigFile.PendingAck
-				local.AckdBy = append(local.AckdBy, LocalID)			// bør det være local.AckdBy = append(remote.AckdBy, LocalID) her?
+				local.AckdBy = append(remote.AckdBy, LocalID)			// bør det være local.AckdBy = append(remote.AckdBy, LocalID) her?
 				break
 			case ConfigFile.Active:
 				local.OrderState = ConfigFile.Active
@@ -86,7 +89,7 @@ func merge(local *ConfigFile.OrderStatus, remote ConfigFile.OrderStatus, LocalID
 
 		case ConfigFile.PendingAck:
 			local.AckdBy = append(remote.AckdBy, LocalID) // legger til alle andre..?
-			if len(local.AckdBy) == 3 { // denne må selvsagt byttes til en "dynamisk" sak, og ikke bare sjekker antall!
+			if len(local.AckdBy) >= len(LivingPeers) { // denne må selvsagt byttes til en "dynamisk" sak, og ikke bare sjekker antall!
 				local.OrderState = ConfigFile.Active
 				// onActive
 			}
@@ -119,11 +122,10 @@ func merge(local *ConfigFile.OrderStatus, remote ConfigFile.OrderStatus, LocalID
 	}
 	// local.ackdBy = local.ackdBy.sort().uniq.array;  -> hva i huleste faen gjør detta?? -> anders har den her
 }
+
 /*
-func Activate(){
-	if (2<3){
-		heste := 123
-		heste ++
+func Activate(local *OrderStatus, LocalID string){
+	switch (local.OrderState){
 	}
 }
 
@@ -136,4 +138,5 @@ func DeActivate(){
 	local.AckdBy = local.AckdBy[:0]	// Destroy!
 }
 */
+
 // GLOBAL QUESTION? 			local.AckdBy = append(remote.AckdBy, LocalID) er nå alle remote og egen lagt til i lokal?

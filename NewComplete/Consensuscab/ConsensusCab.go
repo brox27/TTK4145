@@ -16,6 +16,7 @@ func main() {
 func ConsensusCab(ClearCabOrderChan chan int, ConsensusCabChan chan map[string]*ConfigFile.ConsensusCab, CabButtonChan chan int, PeerUpdateChan chan ConfigFile.PeerUpdate ) {
 	LocalID:="123"
 	RemoteID :="321"
+
 	// DEBUG SHIT!
 	/*
 		newOrderConsensus := make(chan ConfigFile.OrderMsg, 9)      // denne går TIL (FSM?) og bør lagres der og tatt inn som argument
@@ -32,9 +33,12 @@ func ConsensusCab(ClearCabOrderChan chan int, ConsensusCabChan chan map[string]*
 	// cabordersTx := make(chan ConfigFile.AllHallOrders)						// REMEMBER TO USE
 	// BEM EM UP SCUTTY
 
-	var AllCabOrders map[string]*ConfigFile.ConsensusCab
+	AllCabOrders := make (map[string]*ConfigFile.ConsensusCab)
+
 	thisCab := ConfigFile.ConsensusCab{}
+
 	AllCabOrders[LocalID] = &thisCab
+	
 	for {
 		select {
 		case remoteCabConsensus := <-cabOrdersRx:
