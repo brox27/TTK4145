@@ -10,10 +10,11 @@ func ButtonPoll(HallButtonChan chan [2]int, CabButtonChan chan int) {
 	for {
 		for floor := 0; floor < Num_floors; floor++ {
 			for button := 0; button < Num_buttons; button++ {
+
 				newStatus := GetButtonSignal(floor, button)
 				if (LastStatus[floor][button] != newStatus) && (newStatus == 1) {
 					if button == 2 {
-						CabButtonChan <- button
+						CabButtonChan <- floor
 					} else {
 						var hallOrder [2]int
 						hallOrder[0] = floor

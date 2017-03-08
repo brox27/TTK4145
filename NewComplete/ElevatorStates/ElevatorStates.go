@@ -2,36 +2,40 @@ package ElevatorStates
 
 import (
 	"../ConfigFile"
+	. "../Network"
 )
+
 //StateChan := make(chan ConfigFile.Elev)									// Fra FSM.go til StateFileNotYetMade
 //ElevatorStatesChan := make(chan map[string]*ConfigFile.Elev)		// Fra ElevatorStates til HallReqAss
 
-func DoSomethingSmart(StateChan chan ConfigFile.Elev, ElevatorStatesChan chan map[string]*ConfigFile.Elev){
+func DoSomethingSmart(StateChan chan ConfigFile.Elev, ElevatorStatesChan chan map[string]*ConfigFile.Elev) {
 	LocalId := "123.123"
 	// tar inn ELEV struct fra StateChan -> sender "noe" på NW
 	//						-> sender "noe" til HallReqAss på ElevatorStatesChan
 	StateNetworkRx := make(chan map[string]*ConfigFile.Elev)
-//	StateNetworkTx := make(chan map[string]*ConfigFile.Elev)
-	
+	StateNetworkTx := make(chan map[string]*ConfigFile.Elev)
+	go Transmitter(ConfigFile.Port, StateNetworkTx)
+	go Receiver(ConfigFile.Port, StateNetworkRx)
+
 	AllStates := map[string]*ConfigFile.Elev{}
 
-	for{
-		select{
-		case newLocalState := <- StateChan:
+	for {
+		select {
+		case newLocalState := <-StateChan:
 			AllStates[LocalId] = &newLocalState
 			ElevatorStatesChan <- AllStates
 
-		case newRemoteStates := <- StateNetworkRx:
+		case newRemoteStates := <-StateNetworkRx:
 			for elevID := range newRemoteStates {
-				if (elevID == LocalId){
+				if elevID == LocalId {
 					// IGNORE!, we know our own state "best"
-				}else{
+				} else {
 					AllStates[elevID] = newRemoteStates[elevID]
 				}
 			}
 			// sende hver gang får inn eller, bare hvis sikker på oppdatering?
 			ElevatorStatesChan <- AllStates
-		default: 
+		default:
 			// timer som "spammer" på nettverket? altså sender AllStates
 			break
 		}

@@ -33,10 +33,10 @@ func main() {
 
 // 	ClearHallOrderChan chan []int, ClearCabOrderChan chan int)
 func RUN(
-		FloorChan chan int, StateChan chan ConfigFile.Elev,
- 		LocalOrdersChan chan [ConfigFile.Num_floors][ConfigFile.Num_buttons]bool,
- 		ClearHallOrdersChan chan [2]int, ClearCabOrderChan chan int) {
-	
+	FloorChan chan int, StateChan chan ConfigFile.Elev,
+	LocalOrdersChan chan [ConfigFile.Num_floors][ConfigFile.Num_buttons]bool,
+	ClearHallOrdersChan chan [2]int, ClearCabOrderChan chan int) {
+
 	LocalElev := ConfigFile.Elev{}
 
 	timerChan := make(chan int)
@@ -72,21 +72,16 @@ func RUN(
 					LocalElev.Direction = nextDirection(LocalElev)
 					StateChan <- LocalElev
 				}
-			//	if shouldStop(LocalElev) {
-			//		LocalElev.State = ConfigFile.DOORSOPEN
-					// sjekke hvilken type ordre -> consensusCab el. -> consensusHall
-					// <- clearCabOrderChan eller <- clearHallOrderChan
-		//		}
 				break
 
 			case ConfigFile.RUNNING:
-				if shouldStop(LocalElev) {									// se over, kan ha noen mangler, eks. når heisen allerede står i etg hvor det bestilles
-					for button := 0; button<ConfigFile.Num_buttons; button++{
-						if (LocalElev.Orders[LocalElev.Floor][button]){
-							if button<ConfigFile.Num_buttons-1{
-								ClearHallOrdersChan<-[2]int{LocalElev.Floor, button}
-							} else{
-								ClearCabOrderChan<-LocalElev.Floor
+				if shouldStop(LocalElev) { // se over, kan ha noen mangler, eks. når heisen allerede står i etg hvor det bestilles
+					for button := 0; button < ConfigFile.Num_buttons; button++ {
+						if LocalElev.Orders[LocalElev.Floor][button] {
+							if button < ConfigFile.Num_buttons-1 {
+								ClearHallOrdersChan <- [2]int{LocalElev.Floor, button}
+							} else {
+								ClearCabOrderChan <- LocalElev.Floor
 							}
 						}
 					}
@@ -114,28 +109,22 @@ func RUN(
 func nextDirection(LocalElev ConfigFile.Elev) ConfigFile.Direction {
 	if LocalElev.Direction == ConfigFile.UP {
 		if ordersAbove(LocalElev) {
-			println("OPPOVER")
 			return ConfigFile.UP
 		}
 
 		if ordersBelow(LocalElev) {
-			println("NEDOVER")
 			return ConfigFile.DOWN
 		} else {
-			println("STANDA STILLE")
 			return ConfigFile.NEUTRAL
 		}
 	} else {
 		if ordersBelow(LocalElev) {
-			println("NEDOVER")
 			return ConfigFile.DOWN
 		}
 
 		if ordersAbove(LocalElev) {
-			println("OPPOVER")
 			return ConfigFile.UP
 		} else {
-			println("STANDA STILLE")
 			return ConfigFile.NEUTRAL
 		}
 	}
@@ -185,7 +174,7 @@ func shouldStop(LocalElev ConfigFile.Elev) bool {
 	return false
 }
 
-func timer(timerChan chan int){
-	time.Sleep(3*time.Second)
-	timerChan<-1
+func timer(timerChan chan int) {
+	time.Sleep(3 * time.Second)
+	timerChan <- 1
 }

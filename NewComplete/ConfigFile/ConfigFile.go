@@ -3,6 +3,7 @@ package ConfigFile
 const NUM_ELEVATORS = 3
 
 var Elevators_Alive = 3
+var LocalID = ""
 
 const Num_floors = 4
 const Num_buttons = 3
@@ -13,8 +14,8 @@ type Direction int
 
 const (
 	UP Direction = iota
-	DOWN 					
-	NEUTRAL 			
+	DOWN
+	NEUTRAL
 )
 
 type ButtonType int
@@ -32,20 +33,14 @@ const (
 	ACKNOWLEDGE
 	COMPLETE
 )
- 
+
 type OrderMsg struct {
 	Floor   int
 	Button  int
 	MsgType int
-} 
+}
 
 var ELEVATOR_IPS = [NUM_ELEVATORS]string{"123.123.123", "321.321.321", "asd.asd.asd"}
-
-
-
-type AllHallOrders struct {
-	HallOrders [Num_floors][(Num_buttons - 1)]OrderStatus
-}
 
 type CabOrders struct {
 	CabOrders [Num_floors]OrderStatus
@@ -66,17 +61,17 @@ type States int
 
 const (
 	INITIALIZE States = iota
-	IDLE							
-	RUNNING							
-	DOORSOPEN						
+	IDLE
+	RUNNING
+	DOORSOPEN
 )
 
 type Elev struct {
-	State     	States				`json:"hallRequests"`
-	Floor    	int 				`json:"floor"`
-	Direction 	Direction			`json:"direction"`
-	CabOrders   [Num_floors]bool	`json:"cabRequests"`
-	Orders 		[Num_floors][Num_buttons]bool
+	State     States           `json:"hallRequests"`
+	Floor     int              `json:"floor"`
+	Direction Direction        `json:"direction"`
+	CabOrders [Num_floors]bool `json:"cabRequests"`
+	Orders    [Num_floors][Num_buttons]bool
 }
 
 type PeerUpdate struct {
