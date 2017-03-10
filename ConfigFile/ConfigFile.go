@@ -43,14 +43,11 @@ type Elev struct {
 	State     States           `json:"hallRequests"`
 	Floor     int              `json:"floor"`
 	Direction Direction        `json:"direction"`
-	CabOrders []bool 		   `json:"cabRequests"`
 	Orders    [][]bool
 }
 
-// Ander lagde, ikke i bruk \\
 func NewElev() Elev {
 	var e Elev
-	e.CabOrders = make([]bool, Num_floors)
 	e.Orders = make([][]bool, Num_floors)
 	for i := range e.Orders {
 		e.Orders[i] = make([]bool, Num_buttons)
@@ -79,9 +76,16 @@ type OrderStatus struct {
 
 type ConsensusCab struct {
 	CabButtons [Num_floors]OrderStatus
+    ID string
 }
 
 type ConsensusHall struct {
 	HallButtons [Num_floors][Num_buttons - 1]OrderStatus
 	ID string
 }
+
+const ColorCC = "\x1b[38;5;177m"
+const ColorCH = "\x1b[38;5;175m"
+const ColorFSM = "\x1b[38;5;208m"
+const ColorHRA = "\x1b[38;5;79m"
+const ColorNone = "\x1b[0m"
