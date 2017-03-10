@@ -86,7 +86,8 @@ func HallReq(
 		case newConsensusCab := <-ConsensusCabChan:
             fmt.Printf(ConfigFile.ColorHRA+"[HRA]: new cab orders: %+v\n"+ConfigFile.ColorNone, newConsensusCab)
 			for elevID := range newConsensusCab {
-				if _, ok := localCopy.States[elevID]; ok{
+                fmt.Printf(ConfigFile.ColorHRA+"   %v : %+v\n"+ConfigFile.ColorNone, elevID, newConsensusCab[elevID])
+				if _, ok := localCopy.States[elevID]; ok {
 					for floor := 0; floor < ConfigFile.Num_floors; floor++ {
 						if newConsensusCab[elevID].CabButtons[floor].OrderState == ConfigFile.Active {
 							localCopy.States[elevID].CabRequests[floor] = true																																	
@@ -101,6 +102,7 @@ func HallReq(
             fmt.Printf(ConfigFile.ColorHRA+"[HRA]: new elevator states: %+v\n"+ConfigFile.ColorNone, newElevatorStates)
 
 			for elevID := range newElevatorStates {
+                fmt.Printf(ConfigFile.ColorHRA+"   %v : %+v\n"+ConfigFile.ColorNone, elevID, newElevatorStates[elevID])
 				temp := toAssignerCompatible(newElevatorStates[elevID])
 				localCopy.States[elevID] = &temp
 			}
@@ -111,6 +113,13 @@ func HallReq(
 
         }
 
+        
+        fmt.Printf(ConfigFile.ColorHRA+"[HRA]: local copy:\n"+ConfigFile.ColorNone)
+        fmt.Printf(ConfigFile.ColorHRA+"   HallRequests : %+v\n"+ConfigFile.ColorNone, localCopy.HallRequests)
+        fmt.Printf(ConfigFile.ColorHRA+"   States : \n"+ConfigFile.ColorNone)
+        for e := range localCopy.States {
+            fmt.Printf(ConfigFile.ColorHRA+"     %v : %+v\n"+ConfigFile.ColorNone, e, localCopy.States[e])
+        }
 
         // sjekke og evt. ta ut de som ikke lever \\
         if LostPeers != nil{

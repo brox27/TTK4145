@@ -43,14 +43,11 @@ type Elev struct {
 	State     States           `json:"hallRequests"`
 	Floor     int              `json:"floor"`
 	Direction Direction        `json:"direction"`
-	CabOrders []bool 		   `json:"cabRequests"`
 	Orders    [][]bool
 }
 
-// Ander lagde, ikke i bruk \\
 func NewElev() Elev {
 	var e Elev
-	e.CabOrders = make([]bool, Num_floors)
 	e.Orders = make([][]bool, Num_floors)
 	for i := range e.Orders {
 		e.Orders[i] = make([]bool, Num_buttons)

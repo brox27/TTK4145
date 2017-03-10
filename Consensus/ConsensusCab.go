@@ -6,6 +6,7 @@ import (
 	"../driver"
 	"time"
 	"fmt"
+    "reflect"
 )
 
 
@@ -37,7 +38,13 @@ func ConsensusCab(ClearCabOrderChan chan int, ConsensusCabChan chan map[string]*
                 if !exists {
 					thisCab := ConfigFile.ConsensusCab{}
 					AllCabOrders[elevID] = &thisCab
+                    fmt.Printf(ConfigFile.ColorCC+"[CC]:  New elevator: %v\n"+ConfigFile.ColorNone, remoteCabConsensus[elevID])
+					AllCabOrders[elevID] = remoteCabConsensus[elevID]
 				}
+                
+                if !reflect.DeepEqual(remoteCabConsensus[elevID], AllCabOrders[elevID]) {
+                    fmt.Printf(ConfigFile.ColorCC+"[CC]:  New worldview: %v\n"+ConfigFile.ColorNone, remoteCabConsensus[elevID])
+                }
                 
 				//fmt.Printf("merger meg: %+v med: %+v \n", ConfigFile.LocalID, elevID)													// SE HER!
 				for floor := 0; floor < ConfigFile.Num_floors; floor++ {
@@ -56,11 +63,17 @@ func ConsensusCab(ClearCabOrderChan chan int, ConsensusCabChan chan map[string]*
                             ConsensusCabChan <- AllCabOrders
 						})
 				}
+                
+                if !reflect.DeepEqual(remoteCabConsensus[elevID], AllCabOrders[elevID]) {
+                    fmt.Printf(ConfigFile.ColorCC+"[CC]:  Worldview updated: \n   From: %v\n   To:   %v\n"+ConfigFile.ColorNone, remoteCabConsensus[elevID], AllCabOrders[elevID])
+                }
+                
 				//fmt.Printf("%+v has the following CAB statuses: %+v\n", elevID, AllCabOrders[elevID])									// SE HER
 			}
 
 		case ClearedCabOrder := <- ClearCabOrderChan:
             fmt.Printf(ConfigFile.ColorCC+"[CC]:  Cleared cab order: %+v\n"+ConfigFile.ColorNone, ClearedCabOrder)
+            
 			Deactivate(&AllCabOrders[ConfigFile.LocalID].CabButtons[ClearedCabOrder], LivingPeers)
 			fmt.Println(ConfigFile.ColorCC+"Cab order light OFF at floor %v\n"+ConfigFile.ColorNone, ClearedCabOrder)
 			driver.SetButtonLamp(ConfigFile.BUTTON_ORDER_COMMAND, ClearedCabOrder, 0)
