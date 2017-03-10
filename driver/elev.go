@@ -21,7 +21,7 @@ func InitElev(elevatorType ElevatorType) {
     C.elev_init(C.elev_type(elevatorType))
 
 	for floor := 0; floor < Num_floors; floor++ {
-		for button := BUTTON_ORDER_UP; button <= Num_buttons; button++ {		// debug button=0
+		for button := BUTTON_ORDER_UP; button < Num_buttons; button++ {		// debug button=0
 			SetButtonLamp(button, floor, 0)
 		}
 	}
