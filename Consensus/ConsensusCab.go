@@ -52,7 +52,7 @@ func ConsensusCab(ClearCabOrderChan chan int, ConsensusCabChan chan map[string]*
 							Println("%+v completed a cab order at floor %+v\n", elevID, floor)
 						})
 				}
-				Printf("%+v has the following CAB statuses: %+v\n", elevID, AllCabOrders[ConfigFile.LocalID])
+				Printf("%+v has the following CAB statuses: %+v\n", elevID, AllCabOrders[elevID])
 			}
 			ConsensusCabChan <- AllCabOrders
 
