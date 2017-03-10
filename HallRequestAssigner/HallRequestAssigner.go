@@ -45,6 +45,9 @@ func toAssignerCompatible(elev *ConfigFile.Elev) AssignerCompatibleElev {
 		case ConfigFile.NEUTRAL:
 			temp.Direction = "stop"
 	}
+    for f := range elev.Orders {
+        temp.CabRequests[f] = elev.Orders[f][ConfigFile.BUTTON_ORDER_COMMAND]
+    }
 	return temp
 }
 

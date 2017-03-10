@@ -36,8 +36,6 @@ func ConsensusCab(ClearCabOrderChan chan int, ConsensusCabChan chan map[string]*
 				// IF "ny" add to map!
 				_, exists := AllCabOrders[elevID];
                 if !exists {
-					thisCab := ConfigFile.ConsensusCab{}
-					AllCabOrders[elevID] = &thisCab
                     fmt.Printf(ConfigFile.ColorCC+"[CC]:  New elevator: %v\n"+ConfigFile.ColorNone, remoteCabConsensus[elevID])
 					AllCabOrders[elevID] = remoteCabConsensus[elevID]
 				}
@@ -75,8 +73,10 @@ func ConsensusCab(ClearCabOrderChan chan int, ConsensusCabChan chan map[string]*
             fmt.Printf(ConfigFile.ColorCC+"[CC]:  Cleared cab order: %+v\n"+ConfigFile.ColorNone, ClearedCabOrder)
             
 			Deactivate(&AllCabOrders[ConfigFile.LocalID].CabButtons[ClearedCabOrder], LivingPeers)
-			fmt.Println(ConfigFile.ColorCC+"Cab order light OFF at floor %v\n"+ConfigFile.ColorNone, ClearedCabOrder)
 			driver.SetButtonLamp(ConfigFile.BUTTON_ORDER_COMMAND, ClearedCabOrder, 0)
+            ConsensusCabChan <- AllCabOrders
+            
+			fmt.Printf(ConfigFile.ColorCC+"Cab order light OFF at floor %v\n"+ConfigFile.ColorNone, ClearedCabOrder)
 
 		case NewCabButton := <-CabButtonChan:
             fmt.Printf(ConfigFile.ColorCC+"[CC]:  New cab button: %+v\n"+ConfigFile.ColorNone, NewCabButton)
