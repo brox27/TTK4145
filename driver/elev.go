@@ -1,34 +1,24 @@
 package driver
 
 /*
-#cgo CFLAGS: -std=c11
-#cgo LDFLAGS: -lcomedi -lm
-#include "io.h"
-#include "channels.h"
+#cgo CFLAGS: -std=gnu11
+#cgo LDFLAGS: -lpthread -lcomedi -lm
+#include "elev.h"
 */
+import "C"
 
 import (
 	. "../ConfigFile"
-	"C"
-	"fmt"
 )
 
-var LAMP_CHANNEL_MATRIX = [Num_floors][Num_buttons]int{
-	{LIGHT_UP1, LIGHT_DOWN1, LIGHT_COMMAND1},
-	{LIGHT_UP2, LIGHT_DOWN2, LIGHT_COMMAND2},
-	{LIGHT_UP3, LIGHT_DOWN3, LIGHT_COMMAND3},
-	{LIGHT_UP4, LIGHT_DOWN4, LIGHT_COMMAND4}}
+type ElevatorType int
+const (
+    ET_Comedi ElevatorType  = 0
+    ET_Simulation           = 1
+)
 
-var BUTTON_CHANNEL_MATRIX = [Num_floors][Num_buttons]int{
-	{BUTTON_UP1, BUTTON_DOWN1, BUTTON_COMMAND1},
-	{BUTTON_UP2, BUTTON_DOWN2, BUTTON_COMMAND2},
-	{BUTTON_UP3, BUTTON_DOWN3, BUTTON_COMMAND3},
-	{BUTTON_UP4, BUTTON_DOWN4, BUTTON_COMMAND4}}
-
-func InitElev() {
-	if Io_init() == 0 {
-		fmt.Println("Failed")
-	}
+func InitElev(elevatorType ElevatorType) {
+    C.elev_init(C.elev_type(elevatorType))
 
 	for floor := 0; floor < Num_floors; floor++ {
 		for button := BUTTON_ORDER_UP; button <= Num_buttons; button++ {		// debug button=0
@@ -44,76 +34,34 @@ func InitElev() {
 
 func SetMotorDirection(dir Direction) {
 	if dir == NEUTRAL {
-		Io_write_analog(MOTOR, 0)
+        C.elev_set_motor_direction(C.elev_motor_direction_t(0))
 	} else if dir == UP {
-		Io_clear_bit(MOTORDIR)
-		Io_write_analog(MOTOR, MOTOR_SPEED)
+        C.elev_set_motor_direction(C.elev_motor_direction_t(1))
 	} else if dir == DOWN {
-		Io_set_bit(MOTORDIR)
-		Io_write_analog(MOTOR, MOTOR_SPEED)
-	}
+        C.elev_set_motor_direction(C.elev_motor_direction_t(-1))
+    }
 }
 
 func SetButtonLamp(button ButtonType, floor int, value int) {
-	if (Num_floors > floor && floor >= 0) && (0 <= button && button < Num_buttons) {
-		if value == 1 {
-			Io_set_bit(LAMP_CHANNEL_MATRIX[floor][button])
-		} else {
-			Io_clear_bit(LAMP_CHANNEL_MATRIX[floor][button])
-		}
-	}
+    C.elev_set_button_lamp(C.elev_button_type_t(button), C.int(floor), C.int(value))
 }
 
 func SetFloorLight(floor int) {
-	if Num_floors > floor && floor >= 0 {
-		if floor&0x02 != 0 {
-			Io_set_bit(LIGHT_FLOOR_IND1)
-		} else {
-			Io_clear_bit(LIGHT_FLOOR_IND1)
-		}
-
-		if floor&0x01 != 0 {
-			Io_set_bit(LIGHT_FLOOR_IND2)
-		} else {
-			Io_clear_bit(LIGHT_FLOOR_IND2)
-		}
-	}
+    C.elev_set_floor_indicator(C.int(floor))
 }
 
 func SetDoorOpenLamp(value int) {
-	if value == 1 {
-		Io_set_bit(LIGHT_DOOR_OPEN)
-	} else {
-		Io_clear_bit(LIGHT_DOOR_OPEN)
-	}
+    C.elev_set_door_open_lamp(C.int(value))
 }
 
 func GetButtonSignal(floor int, button int) int {
-	if (floor>=0 && floor < Num_floors) && (button >= 0 && button < Num_buttons){
-		return Io_read_bit(BUTTON_CHANNEL_MATRIX[floor][button])
-	}
-	return 0
+    return int(C.elev_get_button_signal(C.elev_button_type_t(button), C.int(floor)))
 }
 
 func GetFloorSensorSignal() int {
-	if Io_read_bit(SENSOR_FLOOR1) != 0 {
-		return 1
-	}
-	if Io_read_bit(SENSOR_FLOOR2) != 0 {
-		return 2
-	}
-	if Io_read_bit(SENSOR_FLOOR3) != 0 {
-		return 3
-	}
-	if Io_read_bit(SENSOR_FLOOR4 ) != 0 {
-		return 4
-	} else {
-		return -1
-	}
+    return int(C.elev_get_floor_sensor_signal())
 }
 
 func SetStopLamp(value int) {
-	if value != 0 {
-		Io_set_bit(STOP)
-	}
+    C.elev_set_stop_lamp(C.int(value))
 }

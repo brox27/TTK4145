@@ -36,7 +36,7 @@ func main() {
 	FromPeersToConsensusCab := make(chan ConfigFile.PeerUpdate)
 	FromPeersToHallReqAss := make(chan ConfigFile.PeerUpdate)
 
-	driver.InitElev()
+	driver.InitElev(driver.ET_Comedi)
 
 	// ** starte GO routines ** \\
 	go driver.ButtonPoll(HallButtonChan, CabButtonChan)
