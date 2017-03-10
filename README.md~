@@ -4,8 +4,7 @@ Sanntidsprogrammering NTNU -> aka verdens beste lab <3
 
 Problemer/issues:
 * noen ganger når en heis er på så tar den CAB order to ganger -> altså den kommer til etg. stopper, lukker opp dører starter timer -> SÅ lukker den dører-> åpner dører igjen og først DA skrur den av lyset i CAB button..
-* alle heiser på nettverket tar alle ordre(hvertfall CAB orders) og de andre fordeles trolig feil -> alt dette kommer fra feil FØR det sendes inn til .D filen. Altså har alle tilordnet seg selv CAB ordren før den filen kalles
-* lagt opp printscreen som viser en issue, med at begge tar samme "cab" order. Dette er printet i Consensus cab og det er at begge tror de skal ha den cab orderen og at den andre ikke har noen cab order
+* UPDATE!: nå tar de ikke hverandre sine jobber!endret: Merge(&AllCabOrders[elevID].CabButtons[floor], remote, elevID, LivingPeers, i consCab, mulig dette må gjøres i hall også... for sliten å tenkte etter. Det som er issue nå er v. f.eks. at en trekker ut IP kabel på "local" så får den kræsj med "index put of range" ett sted!
 * VELDIG tilgjengelig for spm. etc. enten mail(oystein.brox@gmail.com) eller andre steder
 
 Usefull CMDs:
