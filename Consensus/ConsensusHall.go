@@ -27,7 +27,6 @@ func ConsensusHall(ClearHallOrderChan chan [2]int, ConsensusHallChan chan Config
 	for {
 		select {
 		case remoteHallConsensus := <-hallordersRx:
-			// println("remote HALL")
 			RemoteID := remoteHallConsensus.ID
 			for floor := 0; floor < ConfigFile.Num_floors; floor++ {
 				for button := 0; button < ConfigFile.Num_buttons-1; button++ {
@@ -52,20 +51,6 @@ func ConsensusHall(ClearHallOrderChan chan [2]int, ConsensusHallChan chan Config
 
         case PeerUpdate := <-PeerUpdateChan:
 			LivingPeers = PeerUpdate.Peers
-
-		/*
-		case PeerUpdate := <-PeerUpdateChan:
-			LivingPeers = PeerUpdate.Peers
-			if (len(LivingPeers) == 1) && (LivingPeers[0] == ConfigFile.LocalID) || (len(LivingPeers) < 1) {
-				for floor := 0; floor < ConfigFile.Num_floors; floor++ {
-					for button := 0; button < ConfigFile.Num_buttons-1; button++ {
-						if localHallConsensus.HallButtons[floor][button].OrderState == ConfigFile.Inactive {
-							localHallConsensus.HallButtons[floor][button].OrderState = ConfigFile.Default
-						}
-					}
-				}
-			}
-		*/
 		}
 	}
 }

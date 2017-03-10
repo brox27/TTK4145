@@ -2,8 +2,6 @@ package main
 
 import (
 	"./ConfigFile"
-//	"./Consensuscab"
-//	"./Consensushall"
 	"./Consensus"
 	"./ElevatorStates"
 	"./FSM"
