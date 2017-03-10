@@ -50,7 +50,7 @@ func RUN(
 	for {
 		select {
 		case newFloor := <-FloorChan:
-			fmt.Printf("New floor: %+v\n", newFloor)
+			fmt.Printf(ConfigFile.ColorFSM+"[FSM]: New floor: %+v\n"+ConfigFile.ColorNone, newFloor)
 			LocalElev.Floor = newFloor
 			StateChan <- LocalElev
 			SetFloorLight(newFloor) // oppdatere mtp 1 indeksering **********************code quality************************************************************
@@ -93,6 +93,7 @@ func RUN(
 
 
 		case newOrders := <-LocalOrdersChan:
+			fmt.Printf(ConfigFile.ColorFSM+"[FSM]: New orders: %+v\n"+ConfigFile.ColorNone, newOrders)
 
 			switch LocalElev.State {
 
@@ -135,7 +136,7 @@ func RUN(
 			}
 
 		case <-doorTimerChan:
-			fmt.Printf("Door close\n")
+			fmt.Printf(ConfigFile.ColorFSM+"[FSM]: Door close\n"+ConfigFile.ColorNone)
 			switch LocalElev.State {
 
 			case ConfigFile.INITIALIZE:

@@ -30,15 +30,14 @@ func DoSomethingSmart(StateChan chan ConfigFile.Elev, ElevatorStatesChan chan ma
 
 		case newRemoteStates := <-StateNetworkRx:
 			for elevID := range newRemoteStates {
-				if elevID == ConfigFile.LocalID {
-					// IGNORE!, we know our own state "best"
-				} else {
+                // update if not ours, and different from what we already have
+				if elevID != ConfigFile.LocalID  &&  AllStates[elevID] != newRemoteStates[elevID] {
 					AllStates[elevID] = newRemoteStates[elevID]
+                    ElevatorStatesChan <- AllStates
 				}
 			}
 			// sende hver gang får inn eller, bare hvis sikker på oppdatering?
 			//Printf("states sier remote: %+v\n", AllStates)
-			ElevatorStatesChan <- AllStates
 
 		case <- transmittTimer:
 			StateNetworkTx <- AllStates

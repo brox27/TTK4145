@@ -5,8 +5,9 @@ import (
 	. "../Network"
 	"../driver"
 	"time"
-	. "fmt"
+	"fmt"
 )
+
 
 func ConsensusCab(ClearCabOrderChan chan int, ConsensusCabChan chan map[string]*ConfigFile.ConsensusCab, CabButtonChan chan int, PeerUpdateChan chan ConfigFile.PeerUpdate) {
 	cabOrdersRx := make(chan map[string]*ConfigFile.ConsensusCab)
@@ -24,56 +25,58 @@ func ConsensusCab(ClearCabOrderChan chan int, ConsensusCabChan chan map[string]*
 		thisCab.CabButtons[floor].OrderState = ConfigFile.Default
 	}
 	for {
-		Printf("\n \n")
+		//fmt.Printf("\n \n")
 		select {
 
 		case remoteCabConsensus := <-cabOrdersRx:
-			isThere := false
 			for elevID := range remoteCabConsensus {
+            
 				// IF "ny" add to map!
-				if _, ok := AllCabOrders[elevID]; ok {
-					isThere = true
-				}
-				if !isThere{
+				_, exists := AllCabOrders[elevID];
+                if !exists {
 					thisCab := ConfigFile.ConsensusCab{}
 					AllCabOrders[elevID] = &thisCab
 				}
-				Printf("merger meg: %+v med: %+v \n", ConfigFile.LocalID, elevID)													// SE HER!
+                
+				//fmt.Printf("merger meg: %+v med: %+v \n", ConfigFile.LocalID, elevID)													// SE HER!
 				for floor := 0; floor < ConfigFile.Num_floors; floor++ {
 
 					remote := remoteCabConsensus[elevID].CabButtons[floor]
 					Merge(&AllCabOrders[elevID].CabButtons[floor], remote, elevID, LivingPeers, 
 						func() {
 							if elevID == ConfigFile.LocalID {
-								Println("Cab order light ON at floor", floor)
+								fmt.Printf(ConfigFile.ColorCC+"Cab order light ON at floor %v\n"+ConfigFile.ColorNone, floor)
 								driver.SetButtonLamp(ConfigFile.BUTTON_ORDER_COMMAND, floor, 1)
+                                ConsensusCabChan <- AllCabOrders
 							}
 						}, 
 						func() {
-							Println("%+v completed a cab order at floor %+v\n", elevID, floor)
+							fmt.Printf(ConfigFile.ColorCC+"%+v completed a cab order at floor %+v\n"+ConfigFile.ColorNone, elevID, floor)
+                            ConsensusCabChan <- AllCabOrders
 						})
 				}
-				Printf("%+v has the following CAB statuses: %+v\n", elevID, AllCabOrders[elevID])									// SE HER
+				//fmt.Printf("%+v has the following CAB statuses: %+v\n", elevID, AllCabOrders[elevID])									// SE HER
 			}
-			ConsensusCabChan <- AllCabOrders
 
 		case ClearedCabOrder := <- ClearCabOrderChan:
+            fmt.Printf(ConfigFile.ColorCC+"[CC]:  Cleared cab order: %+v\n"+ConfigFile.ColorNone, ClearedCabOrder)
 			Deactivate(&AllCabOrders[ConfigFile.LocalID].CabButtons[ClearedCabOrder], LivingPeers)
-			Println("Cab order light OFF at floor", ClearedCabOrder)
+			fmt.Println(ConfigFile.ColorCC+"Cab order light OFF at floor %v\n"+ConfigFile.ColorNone, ClearedCabOrder)
 			driver.SetButtonLamp(ConfigFile.BUTTON_ORDER_COMMAND, ClearedCabOrder, 0)
 
 		case NewCabButton := <-CabButtonChan:
+            fmt.Printf(ConfigFile.ColorCC+"[CC]:  New cab button: %+v\n"+ConfigFile.ColorNone, NewCabButton)
 			Activate(&AllCabOrders[ConfigFile.LocalID].CabButtons[NewCabButton])
 
 		case <- transmittTimer:
 			cabOrdersTx <- AllCabOrders
 
 		case PeerUpdate := <-PeerUpdateChan:
-			Printf("Peer update:\n  %+v\n", PeerUpdate)
+            fmt.Printf(ConfigFile.ColorCC+"[CC]:  Peer update: %+v\n"+ConfigFile.ColorNone, PeerUpdate)
 			LivingPeers = PeerUpdate.Peers
 			if len(PeerUpdate.Lost)!=0{
-				Printf("Lost: %+v\n", PeerUpdate.Lost)
-				Printf("\ntest\n%+v\n", AllCabOrders)
+				fmt.Printf("Lost: %+v\n", PeerUpdate.Lost)
+				fmt.Printf("\ntest\n%+v\n", AllCabOrders)
 				for _, lostID := range PeerUpdate.Lost {
 					for floor := 0; floor < ConfigFile.Num_floors; floor++{
 						if (AllCabOrders[lostID].CabButtons[floor].OrderState == ConfigFile.Inactive){
