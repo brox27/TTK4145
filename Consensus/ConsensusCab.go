@@ -24,6 +24,7 @@ func ConsensusCab(ClearCabOrderChan chan int, ConsensusCabChan chan map[string]*
 		thisCab.CabButtons[floor].OrderState = ConfigFile.Default
 	}
 	for {
+		Printf("\n \n")
 		select {
 
 		case remoteCabConsensus := <-cabOrdersRx:
@@ -37,7 +38,7 @@ func ConsensusCab(ClearCabOrderChan chan int, ConsensusCabChan chan map[string]*
 					thisCab := ConfigFile.ConsensusCab{}
 					AllCabOrders[elevID] = &thisCab
 				}
-				Printf("merger meg: %+v med: %+v \n", ConfigFile.LocalID, elevID)
+				Printf("merger meg: %+v med: %+v \n", ConfigFile.LocalID, elevID)													// SE HER!
 				for floor := 0; floor < ConfigFile.Num_floors; floor++ {
 
 					remote := remoteCabConsensus[elevID].CabButtons[floor]
@@ -52,7 +53,7 @@ func ConsensusCab(ClearCabOrderChan chan int, ConsensusCabChan chan map[string]*
 							Println("%+v completed a cab order at floor %+v\n", elevID, floor)
 						})
 				}
-				Printf("%+v has the following CAB statuses: %+v\n", elevID, AllCabOrders[elevID])
+				Printf("%+v has the following CAB statuses: %+v\n", elevID, AllCabOrders[elevID])									// SE HER
 			}
 			ConsensusCabChan <- AllCabOrders
 
