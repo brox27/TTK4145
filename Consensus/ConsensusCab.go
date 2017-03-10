@@ -20,6 +20,7 @@ func ConsensusCab(ClearCabOrderChan chan int, ConsensusCabChan chan map[string]*
 
 	AllCabOrders := make(map[string]*ConfigFile.ConsensusCab)
 	thisCab := ConfigFile.ConsensusCab{}
+    thisCab.ID = ConfigFile.LocalID
 	AllCabOrders[ConfigFile.LocalID] = &thisCab
 	for floor := 0; floor < ConfigFile.Num_floors; floor++ {
 		thisCab.CabButtons[floor].OrderState = ConfigFile.Default

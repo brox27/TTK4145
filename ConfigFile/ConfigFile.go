@@ -79,6 +79,7 @@ type OrderStatus struct {
 
 type ConsensusCab struct {
 	CabButtons [Num_floors]OrderStatus
+    ID string
 }
 
 type ConsensusHall struct {
