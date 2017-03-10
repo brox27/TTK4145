@@ -42,7 +42,7 @@ func ConsensusCab(ClearCabOrderChan chan int, ConsensusCabChan chan map[string]*
 				for floor := 0; floor < ConfigFile.Num_floors; floor++ {
 
 					remote := remoteCabConsensus[elevID].CabButtons[floor]
-					Merge(&AllCabOrders[ConfigFile.LocalID].CabButtons[floor], remote, elevID, LivingPeers, 
+					Merge(&AllCabOrders[elevID].CabButtons[floor], remote, elevID, LivingPeers, 
 						func() {
 							if elevID == ConfigFile.LocalID {
 								Println("Cab order light ON at floor", floor)
