@@ -45,7 +45,6 @@ func toAssignerCompatible(elev *ConfigFile.Elev) AssignerCompatibleElev {
 		case ConfigFile.NEUTRAL:
 			temp.Direction = "stop"
 	}
-//	temp.CabRequests = elev.CabOrders
 	return temp
 }
 
