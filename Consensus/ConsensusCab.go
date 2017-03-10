@@ -37,7 +37,7 @@ func ConsensusCab(ClearCabOrderChan chan int, ConsensusCabChan chan map[string]*
 					thisCab := ConfigFile.ConsensusCab{}
 					AllCabOrders[elevID] = &thisCab
 				}
-
+				Printf("merger meg: %+v med: %+v \n", ConfigFile.LocalID, elevID)
 				for floor := 0; floor < ConfigFile.Num_floors; floor++ {
 
 					remote := remoteCabConsensus[elevID].CabButtons[floor]
