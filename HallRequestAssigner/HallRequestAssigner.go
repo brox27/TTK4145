@@ -112,7 +112,7 @@ func HallReq(
 			}
 
 		case PeerUpdate := <- FromPeersToHallReqAss:
-			fmt.Printf("new PEER \n")
+			fmt.Printf("Peer status %+v \n",PeerUpdate )
 			LostPeers = PeerUpdate.Lost
 			// legger til?
 			if _, ok := localCopy.States[PeerUpdate.New]; !ok {
