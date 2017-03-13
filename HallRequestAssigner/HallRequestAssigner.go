@@ -100,7 +100,7 @@ func HallReq(
 		case newElevatorStates := <-ElevatorStatesChan:
 			fmt.Printf("new STATE \n")
 			for elevID := range newElevatorStates {
-				// oppdatere 
+				if
 				localCopy.States[elevID].Behaviour = toAssignerCompatible(newElevatorStates[elevID]).Behaviour
 				localCopy.States[elevID].Floor = toAssignerCompatible(newElevatorStates[elevID]).Floor
 				localCopy.States[elevID].Direction = toAssignerCompatible(newElevatorStates[elevID]).Direction
@@ -111,6 +111,11 @@ func HallReq(
 		case PeerUpdate := <- FromPeersToHallReqAss:
 			fmt.Printf("new PEER \n")
 			LostPeers = PeerUpdate.Lost
+			// legger til?
+			if PeerUpdate.New != nil{
+				localCopy.States[PeerUpdate.New] := &AssignerCompatibleElev{}
+			}
+
 		}
 
 
