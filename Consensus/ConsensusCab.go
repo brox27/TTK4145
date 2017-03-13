@@ -39,7 +39,7 @@ func ConsensusCab(ClearCabOrderChan chan int, ConsensusCabChan chan map[string]*
 				}
 
 				if !reflect.DeepEqual(remoteCabConsensus[elevID], AllCabOrders[elevID]) {
-                    fmt.Printf(ConfigFile.ColorCC+"[CC]:  New worldview: %v\n"+ConfigFile.ColorNone, remoteCabConsensus[elevID])
+             //       fmt.Printf(ConfigFile.ColorCC+"[CC]:  New worldview: %v\n"+ConfigFile.ColorNone, remoteCabConsensus[elevID])
                 }
 //				Printf("merger meg: %+v med: %+v \n", ConfigFile.LocalID, elevID)													// SE HER!
 				for floor := 0; floor < ConfigFile.Num_floors; floor++ {
@@ -60,7 +60,7 @@ func ConsensusCab(ClearCabOrderChan chan int, ConsensusCabChan chan map[string]*
 				}
 			//	Printf("%+v has the following CAB statuses: %+v\n", elevID, AllCabOrders[elevID])									// SE HER
 				if !reflect.DeepEqual(remoteCabConsensus[elevID], AllCabOrders[elevID]) {
-                    fmt.Printf(ConfigFile.ColorCC+"[CC]:  Worldview updated: \n   From: %v\n   To:   %v\n"+ConfigFile.ColorNone, remoteCabConsensus[elevID], AllCabOrders[elevID])
+            //        fmt.Printf(ConfigFile.ColorCC+"[CC]:  Worldview updated: \n   From: %v\n   To:   %v\n"+ConfigFile.ColorNone, remoteCabConsensus[elevID], AllCabOrders[elevID])
                 }
 			}
 

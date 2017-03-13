@@ -70,7 +70,7 @@ func RUN(
 			case ConfigFile.RUNNING:
 				if ordersAbove(LocalElev) || ordersBelow(LocalElev){
 					fmt.Printf("\n**********************************************Started timer*************************************************'\n")
-					OrderTimedOut = time.After(10*time.Second)
+					OrderTimedOut = time.After(15*time.Second)
 				}
 				if shouldStop(LocalElev) { // se over, kan ha noen mangler, eks. når heisen allerede står i etg hvor det bestilles
 					for button := 0; button < ConfigFile.Num_buttons; button++ {
@@ -108,6 +108,10 @@ func RUN(
 				break
 
 			case ConfigFile.IDLE:
+				if hasNewOrders(newOrders, LocalElev){
+					fmt.Printf("\n**********************************************Started timer*************************************************'\n")
+					OrderTimedOut = time.After(15*time.Second)
+				}
 				LocalElev.Orders = newOrders
 				if nextDirection(LocalElev) != ConfigFile.NEUTRAL {
 					LocalElev.State = ConfigFile.RUNNING
@@ -140,6 +144,10 @@ func RUN(
 				break
 
 			case ConfigFile.DOORSOPEN:
+				if hasNewOrders(newOrders, LocalElev){
+					fmt.Printf("\n**********************************************Started timer*************************************************'\n")
+					OrderTimedOut = time.After(15*time.Second)
+				}
 				LocalElev.Orders = newOrders
 				// if order at this floor, keep door open longer?
 				break
@@ -191,8 +199,10 @@ func RUN(
 				fmt.Printf("******************************************************\n")
 				fmt.Printf("******************************************************\n")
 				TransmitEnable <- false
+				SetMotorDirection(ConfigFile.NEUTRAL)
 				time.Sleep(20* time.Second)
 				TransmitEnable <- true
+				SetMotorDirection(LocalElev.Direction)
 			}
 		}
 	}
@@ -268,12 +278,16 @@ func shouldStop(LocalElev ConfigFile.Elev) bool {
 
 
 func hasNewOrders(newOrders [][]bool, LocalElev ConfigFile.Elev) bool{
-	for f := 0; f < ConfigFile.Num_buttons; f++{
+	fmt.Printf("vi tester has new orders ############################################################## \n")
+	for f := 0; f < ConfigFile.Num_floors; f++{
 		for b := 0; b < ConfigFile.Num_buttons; b++{
+			fmt.Printf("floor %+v button: %+v da sier NO %+v og local %+v \n", f, b, newOrders[f][b], LocalElev.Orders[f][b])
 			if (LocalElev.Orders[f][b] != newOrders[f][b]){
+				fmt.Printf("score \n")
 				return true
 			}
 		}
 	}
+	fmt.Printf("vi drar tilbake uten score \n")
 	return false
 }

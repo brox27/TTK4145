@@ -31,7 +31,7 @@ func ConsensusHall(ClearHallOrderChan chan [2]int, ConsensusHallChan chan Config
 		select {
 		case remoteHallConsensus := <-hallordersRx:
 			if !reflect.DeepEqual(remoteHallConsensus, localHallConsensus) {
-                fmt.Printf(ConfigFile.ColorCH+"[CH]:  New worldview: %v\n"+ConfigFile.ColorNone, remoteHallConsensus)
+      //          fmt.Printf(ConfigFile.ColorCH+"[CH]:  New worldview: %v\n"+ConfigFile.ColorNone, remoteHallConsensus)
             }
 			RemoteID := remoteHallConsensus.ID
 			for floor := 0; floor < ConfigFile.Num_floors; floor++ {
@@ -50,7 +50,7 @@ func ConsensusHall(ClearHallOrderChan chan [2]int, ConsensusHallChan chan Config
 				}
 			}
             if !reflect.DeepEqual(remoteHallConsensus, localHallConsensus) {
-                fmt.Printf(ConfigFile.ColorCH+"[CH]:  Worldview updated: \n   From: %v\n   To:   %v\n"+ConfigFile.ColorNone, remoteHallConsensus, localHallConsensus)
+        //        fmt.Printf(ConfigFile.ColorCH+"[CH]:  Worldview updated: \n   From: %v\n   To:   %v\n"+ConfigFile.ColorNone, remoteHallConsensus, localHallConsensus)
             }
 
 		case ClearedHallOrder := <- ClearHallOrderChan:

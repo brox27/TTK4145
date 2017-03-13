@@ -98,7 +98,7 @@ func HallReq(
 			fmt.Printf("ferdig CC \n")
 
 		case newElevatorStates := <-ElevatorStatesChan:
-			fmt.Printf("new STATE \n")
+		//	fmt.Printf("new STATE \n")
 			for elevID := range newElevatorStates {
 				if (elevID!=""){
 					if _, ok := localCopy.States[elevID]; ok {
@@ -139,17 +139,17 @@ func HallReq(
 
 
 
-		fmt.Printf(ConfigFile.ColorHRA+"[HRA]: local copy:\n"+ConfigFile.ColorNone)
-        fmt.Printf(ConfigFile.ColorHRA+"   HallRequests : %+v\n"+ConfigFile.ColorNone, localCopy.HallRequests)
-        fmt.Printf(ConfigFile.ColorHRA+"   States : \n"+ConfigFile.ColorNone)
-        for e := range localCopy.States {
-            fmt.Printf(ConfigFile.ColorHRA+"     %v : %+v\n"+ConfigFile.ColorNone, e, localCopy.States[e])
-        }
+	//	fmt.Printf(ConfigFile.ColorHRA+"[HRA]: local copy:\n"+ConfigFile.ColorNone)
+    //    fmt.Printf(ConfigFile.ColorHRA+"   HallRequests : %+v\n"+ConfigFile.ColorNone, localCopy.HallRequests)
+   //     fmt.Printf(ConfigFile.ColorHRA+"   States : \n"+ConfigFile.ColorNone)
+       // for e := range localCopy.States {
+   //         fmt.Printf(ConfigFile.ColorHRA+"     %v : %+v\n"+ConfigFile.ColorNone, e, localCopy.States[e])
+    //    }
 
         // sjekke og evt. ta ut de som ikke lever \\
         
 
-        fmt.Printf("her da\n")
+       // fmt.Printf("her da\n")
         arg, _ := json.Marshal(localCopy)
         dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
 //		fmt.Printf("sender inn:     %+v\n", string(arg) )
