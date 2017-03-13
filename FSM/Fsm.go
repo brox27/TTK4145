@@ -75,11 +75,13 @@ func RUN(
 
 
 		case newOrders := <-LocalOrdersChan:
+			fmt.Printf("*FSM got new orders \n")
 			switch LocalElev.State {
 			case ConfigFile.INITIALIZE:
 				break
 
 			case ConfigFile.IDLE:
+				fmt.Printf("*FSM  was IDLE \n")
 				if hasNewOrders(newOrders, LocalElev){
 					orderTimerChan = time.After(15*time.Second)
 				}
@@ -89,7 +91,9 @@ func RUN(
 					LocalElev.State = ConfigFile.RUNNING
 					LocalElev.Direction = nextDirection(LocalElev)
 					driver.SetMotorDirection(LocalElev.Direction)
+					fmt.Printf("*FSM above StateChan")
 					StateChan <- LocalElev
+					fmt.Printf("*FSM below StateChan")
 				}else{
 					for button := 0; button < ConfigFile.Num_buttons; button++ {
 						if LocalElev.Orders[LocalElev.Floor][button] {
@@ -97,9 +101,13 @@ func RUN(
 							driver.SetDoorOpenLamp(1)
 							LocalElev.State = ConfigFile.DOORSOPEN
 							if button < ConfigFile.Num_buttons-1 {
+								fmt.Printf("*FSM above ClearHallOrdersChan")
 								ClearHallOrdersChan <- [2]int{LocalElev.Floor, button}
+								fmt.Printf("*FSM below ClearHallOrdersChan")
 							} else {
+								fmt.Printf("*FSM above ClearCabOrderChan")
 								ClearCabOrderChan <- LocalElev.Floor
+								fmt.Printf("*FSM below ClearCabOrderChan")
 							}
 						}
 					}
@@ -107,6 +115,7 @@ func RUN(
 				break
 
 			case ConfigFile.RUNNING:
+				fmt.Printf("*FSM  was RUNNING \n")
 				if hasNewOrders(newOrders, LocalElev){
 					orderTimerChan = time.After(15*time.Second)
 				}
@@ -114,6 +123,7 @@ func RUN(
 				break
 
 			case ConfigFile.DOORSOPEN:
+				fmt.Printf("*FSM  was DOORSOPEN \n")
 				if hasNewOrders(newOrders, LocalElev){
 					orderTimerChan = time.After(15*time.Second)
 				}

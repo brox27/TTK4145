@@ -157,7 +157,9 @@ func HallRequestAssigner(
                 }
                 assignedOrders[f][2] = localCopy.States[ConfigFile.LocalID].CabRequests[f]
             }
+            fmt.Printf("*HRA aboce LocalOrdersChan\n")
             LocalOrdersChan <- assignedOrders
+            fmt.Printf("*HRA below LocalOrdersChan\n")
         }else{
             fmt.Printf("err : %+v : %+v\n", err, result)
         }
