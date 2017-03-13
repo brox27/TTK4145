@@ -23,7 +23,7 @@ type AssignerCompatibleInput struct {
 	States       map[string]*AssignerCompatibleElev			`json:"states"`
 }
 
-func toAssignerCompatible(elev *ConfigFile.Elev) AssignerCompatibleElev {
+func toAssignerCompatible(elev ConfigFile.Elev) AssignerCompatibleElev {
 	temp := AssignerCompatibleElev{}
 	switch elev.State{
 		case ConfigFile.INITIALIZE:
@@ -102,7 +102,7 @@ func HallRequestAssigner(
 					fmt.Printf("*HRA above if 2\n")
 					if _, ok := localCopy.States[elevID]; ok {
 						fmt.Printf("*HRA in if 2, 1\n")
-						temp := toAssignerCompatible(newElevatorStates[elevID])
+						temp := toAssignerCompatible(*newElevatorStates[elevID])
 						fmt.Printf("*HRA in if 2, 2\n")
 						localCopy.States[elevID].Behaviour = temp.Behaviour
 						fmt.Printf("*HRA in if 2, 3\n")
