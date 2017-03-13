@@ -160,6 +160,7 @@ func HallRequestAssigner(
             LocalOrdersChan <- assignedOrders
         }else{
             fmt.Printf("err : %+v : %+v\n", err, result)
-        }        
+        }
+        fmt.Printf("*HRA end of for \n")        
     }
 }
