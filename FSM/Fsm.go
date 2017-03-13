@@ -31,7 +31,9 @@ func RUN(
 		case newFloor := <-FloorChan:
 			fmt.Printf("New floor: %+v\n", newFloor)
 			LocalElev.Floor = newFloor
-			StateChan <- LocalElev
+			//fmt.Printf("above StateChan \n ")
+			//StateChan <- LocalElev
+			//fmt.Printf("below StateChan \n ")
 			driver.SetFloorLight(newFloor)
 
 			switch LocalElev.State {
@@ -40,6 +42,7 @@ func RUN(
 				driver.SetMotorDirection(ConfigFile.NEUTRAL)
 				LocalElev.State = ConfigFile.IDLE
 				LocalElev.Direction = ConfigFile.NEUTRAL
+				StateChan <- LocalElev
 				break
 
 			case ConfigFile.IDLE:
@@ -53,9 +56,13 @@ func RUN(
 					for button := 0; button < ConfigFile.Num_buttons; button++ {
 						if LocalElev.Orders[LocalElev.Floor][button] {
 							if button < ConfigFile.Num_buttons-1 {
+								fmt.Printf("*FSM above ClearHallOrdersChan NewFLOOR")
 								ClearHallOrdersChan <- [2]int{LocalElev.Floor, button}
+								fmt.Printf("*FSM below ClearHallOrdersChan NewFLOOR")
 							} else {
+								fmt.Printf("*FSM above ClearCabOrderChan NewFLOOR")
 								ClearCabOrderChan <- LocalElev.Floor
+								fmt.Printf("*FSM below ClearCabOrderChan NewFLOOR")
 							}
 						}
 					}
@@ -65,7 +72,9 @@ func RUN(
 					fmt.Printf("Door open\n")
 					driver.SetDoorOpenLamp(1)
 					LocalElev.State = ConfigFile.DOORSOPEN
+					fmt.Printf("above StateChan \n ")
 					StateChan <- LocalElev
+					fmt.Printf("below StateChan \n ")
 					break
 				}
 
