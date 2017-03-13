@@ -69,6 +69,7 @@ func RUN(
 
 			case ConfigFile.RUNNING:
 				if ordersAbove(LocalElev) || ordersBelow(LocalElev){
+					fmt.Printf("\n**********************************************Started timer*************************************************'\n")
 					OrderTimedOut = time.After(10*time.Second)
 				}
 				if shouldStop(LocalElev) { // se over, kan ha noen mangler, eks. når heisen allerede står i etg hvor det bestilles
@@ -131,6 +132,10 @@ func RUN(
 				break
 
 			case ConfigFile.RUNNING:
+				if hasNewOrders(newOrders, LocalElev){
+					fmt.Printf("\n**********************************************Started timer*************************************************'\n")
+					OrderTimedOut = time.After(10*time.Second)
+				}
 				LocalElev.Orders = newOrders
 				break
 
@@ -170,7 +175,7 @@ func RUN(
 				}
 		case <- OrderTimedOut:
 			if(LocalElev.State != ConfigFile.IDLE){
-				fmt.Printf("******************************************************\n")
+				fmt.Printf("**********************Timed out***********************\n")
 				fmt.Printf("******************************************************\n")
 				fmt.Printf("******************************************************\n")
 				fmt.Printf("******************************************************\n")
@@ -257,6 +262,18 @@ func shouldStop(LocalElev ConfigFile.Elev) bool {
 			return true
 		} else {
 			return (!ordersBelow(LocalElev))
+		}
+	}
+	return false
+}
+
+
+func hasNewOrders(newOrders [][]bool, LocalElev ConfigFile.Elev) bool{
+	for f := 0; f < ConfigFile.Num_buttons; f++{
+		for b := 0; b < ConfigFile.Num_buttons; b++{
+			if (LocalElev.Orders[f][b] != newOrders[f][b]){
+				return true
+			}
 		}
 	}
 	return false
