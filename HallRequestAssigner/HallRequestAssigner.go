@@ -3,7 +3,7 @@ package hallRequestAssigner
 import (
 	"../ConfigFile"
 	"encoding/json"
-//	"reflect"
+	"reflect"
 	"fmt"
 	"path/filepath"
 	"os/exec"
@@ -94,13 +94,22 @@ func HallRequestAssigner(
 
 		case newElevatorStates := <-ElevatorStatesChan:
 			fmt.Printf("*HRA newElevatorStates\n")
+			if !reflect.DeepEqual(newElevatorStates, localCopy.States){
+				fmt.Printf("*HRA above for\n")
 			for elevID := range newElevatorStates {
+				fmt.Printf("*HRA above if 1\n")
 				if (elevID!=""){
+					fmt.Printf("*HRA above if 2\n")
 					if _, ok := localCopy.States[elevID]; ok {
+						fmt.Printf("*HRA in if 2, 1\n")
 						temp := toAssignerCompatible(newElevatorStates[elevID])
+						fmt.Printf("*HRA in if 2, 2\n")
 						localCopy.States[elevID].Behaviour = temp.Behaviour
+						fmt.Printf("*HRA in if 2, 3\n")
 						localCopy.States[elevID].Floor = temp.Floor
+						fmt.Printf("*HRA in if 2, 4\n")
 						localCopy.States[elevID].Direction = temp.Direction
+						fmt.Printf("*HRA in if 2, 5\n")
 
 						/*
 						localCopy.States[elevID].Behaviour
@@ -111,6 +120,7 @@ func HallRequestAssigner(
 					}
 				}
 			}
+		}
 
 		case PeerUpdate := <- FromPeersToHallReqAss:
 			fmt.Printf("Peer status %+v \n",PeerUpdate )
