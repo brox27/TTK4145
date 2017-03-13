@@ -116,15 +116,14 @@ func HallReq(
 			LostPeers = PeerUpdate.Lost
 			// legger til?
 			if _, ok := localCopy.States[PeerUpdate.New]; !ok {
-				temp:=ConfigFile.NewElev()
-				temp2:=toAssignerCompatible(&temp)
-				localCopy.States[PeerUpdate.New] = &temp2
+				localCopy.States[PeerUpdate.New] = &AssignerCompatibleElev{}
 
 			}
 			if LostPeers != nil{
 				temp := make (map[string]*AssignerCompatibleElev)
 				for _, elevID := range PeerUpdate.Peers{
 					temp[elevID]=localCopy.States[elevID]
+					fmt.Printf("\n inne PeerUpdate ser den nye temp slik ut: \n %+v \n", temp[elevID])
 				}
 				localCopy.States=temp
 
