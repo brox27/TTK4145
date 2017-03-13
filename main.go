@@ -10,6 +10,8 @@ import (
 	"./driver"
 	"flag"
 	"runtime"
+	"os"
+	"os/signal"
 )
 
 func main() {
@@ -19,37 +21,44 @@ func main() {
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	// ** setter opp channels ** \\
+	// ** Setup of channels ** \\
 	FloorChan := make(chan int)                                        	// Fra driver.go til FSM.go
 	HallButtonChan := make(chan [2]int)                                	// fra driver.go til ConsensusHall
 	CabButtonChan := make(chan int)                                    	// Fra driver.go til ConsensusCab
 	ClearHallOrderChan := make(chan [2]int)                            	// Fra FSM.go til ConsensusHall
 	ClearCabOrderChan := make(chan int)                                	// Fra FSM.go til ConsensusCab
-	StateChan := make(chan ConfigFile.Elev,3)                            	// Fra FSM.go til StateFileNotYetMade
-	PeerUpdateChan := make(chan ConfigFile.PeerUpdate)                 	// Fra "egen NW modul fra Anders" Til ConsHall/ConsCab/HallReqAss
+	StateChan := make(chan ConfigFile.Elev,3)                           // Fra FSM.go til ElevatorStatesCoord
+	PeerUpdateChan := make(chan ConfigFile.PeerUpdate)                 	// Fra Peers til Repeater
 	ConsensusCabChan := make(chan map[string]*ConfigFile.ConsensusCab) 	// Fra ConsensusCab til HallReqAss
 	ConsensusHallChan := make(chan ConfigFile.ConsensusHall)           	// Fra ConsensusHall til HallReqAss
-	ElevatorStatesChan := make(chan map[string]*ConfigFile.Elev,3)       	// Fra ElevatorStates til HallReqAss
-	TransmitEnable := make(chan bool)                                  	// Fra Peers til consensusCab/consensusHall/HallReqAss
+	ElevatorStatesChan := make(chan map[string]*ConfigFile.Elev,3)      // Fra ElevatorStates til HallReqAss
+	TransmitEnable := make(chan bool)                                  	// Fra FSM til peers
 	LocalOrdersChan := make(chan [][]bool)							   	// Fra HallReqAss til FSM.go
-	FromPeersToConsensusHall := make(chan ConfigFile.PeerUpdate)
-	FromPeersToConsensusCab := make(chan ConfigFile.PeerUpdate)
-	FromPeersToHallReqAss := make(chan ConfigFile.PeerUpdate)
+	FromPeersToConsensusHall := make(chan ConfigFile.PeerUpdate)		// Fra Repeater til ConsensusHall
+	FromPeersToConsensusCab := make(chan ConfigFile.PeerUpdate)			// Fra Repeater til ConsensusCab
+	FromPeersToHallReqAss := make(chan ConfigFile.PeerUpdate)			// Fra Repeater til HallReqAss
 
 	driver.InitElev()
 
-	// ** starte GO routines ** \\
+	// ** start GO routines ** \\
 	go driver.ButtonPoll(HallButtonChan, CabButtonChan)
 	go driver.FloorPoll(FloorChan)
 	go FSM.RUN(FloorChan, StateChan, LocalOrdersChan, ClearHallOrderChan, ClearCabOrderChan, TransmitEnable)
 	go Consensus.ConsensusHall(ClearHallOrderChan, ConsensusHallChan, HallButtonChan, FromPeersToConsensusHall)
 	go Consensus.ConsensusCab(ClearCabOrderChan, ConsensusCabChan, CabButtonChan, FromPeersToConsensusCab)
-	go ElevatorStates.DoSomethingSmart(StateChan, ElevatorStatesChan)
-	go HallRequestAssigner.HallReq(ConsensusHallChan, ConsensusCabChan, ElevatorStatesChan, LocalOrdersChan, FromPeersToHallReqAss)
+	go ElevatorStates.ElevatorStatesCoordinator(StateChan, ElevatorStatesChan)
+	go hallRequestAssigner.HallRequestAssigner(ConsensusHallChan, ConsensusCabChan, ElevatorStatesChan, LocalOrdersChan, FromPeersToHallReqAss)
 	go Peers.Transmitter(ConfigFile.PeersPort, ConfigFile.LocalID, TransmitEnable)
 	go Peers.Receiver(ConfigFile.PeersPort, PeerUpdateChan)
-	go Peers.Repeater(PeerUpdateChan, FromPeersToConsensusHall, FromPeersToConsensusCab, FromPeersToHallReqAss)//{FromPeersToConsensusHall, FromPeersToConsensusCab, FromPeersToHallReqAss})	//3](chan ConfigFile.PeerUpdate){
+	go Peers.Repeater(PeerUpdateChan, FromPeersToConsensusHall, FromPeersToConsensusCab, FromPeersToHallReqAss)
 
-	println("Main ferdig")
-	select {}
+	osSignal := make(chan os.Signal)
+	signal.Notify(osSignal, os.Interrupt)
+
+	println("System is running, all goroutines are active")
+	select {
+		case <- osSignal:
+			println("Interrupt detected, shutting down motor")
+			driver.SetMotorDirection(ConfigFile.NEUTRAL)
+	}
 }

@@ -12,4 +12,12 @@ Usefull CMDs:
 * "who" -> finner ut om noen er SSHet seg på, set etter "ipen" på slutten
 * "ps -aux|grep < id fra who >" e.g. pts/0
 * "kill -9 <prosess id fra sshd> (ene linje fra over)" e.g. 7427
+* "grep -nr <word you want to find>"
+simulate packet loss:
+* init(only first time after reboot) "sudo modprobe sch_netem"
+* sudo tc qdisc add dev eth0 root netem loss 15%" - for adding 15% !Only first time!
+* sudo tc qdisc change dev eth0 root netem loss 20%" - for cahnging to 20% 
 
+
+Things that mayby should be a function...?
+* "ServidedOrder i FSM" aka vi clearer flere ganger? er dobble for loop i FSM flere steder...

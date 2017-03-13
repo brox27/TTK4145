@@ -1,15 +1,15 @@
 package driver
 
 import (
-	. "../ConfigFile"
+	"../ConfigFile"
 	"time"
 )
 
 func ButtonPoll(HallButtonChan chan [2]int, CabButtonChan chan int) {
-	LastStatus := [Num_floors][Num_buttons]int{}
+	LastStatus := [ConfigFile.Num_floors][ConfigFile.Num_buttons]int{}
 	for {
-		for floor := 0; floor < Num_floors; floor++ {
-			for button := 0; button < Num_buttons; button++ {
+		for floor := 0; floor < ConfigFile.Num_floors; floor++ {
+			for button := 0; button < ConfigFile.Num_buttons; button++ {
 				newStatus := GetButtonSignal(floor, button)
 				if (LastStatus[floor][button] != newStatus) && (newStatus == 1) {
 					if button == 2 {
@@ -36,6 +36,6 @@ func FloorPoll(FloorChan chan int) {
 			FloorChan <- floor
 		}
 		LastStatus = floor
-		//time.Sleep(5 * time.Millisecond)
+		time.Sleep(5 * time.Millisecond)
 	}
 }

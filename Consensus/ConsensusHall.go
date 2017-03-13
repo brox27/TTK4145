@@ -13,8 +13,8 @@ import (
 func ConsensusHall(ClearHallOrderChan chan [2]int, ConsensusHallChan chan ConfigFile.ConsensusHall,  HallButtonChan chan [2]int, PeerUpdateChan chan ConfigFile.PeerUpdate) {
 	hallordersRx := make(chan ConfigFile.ConsensusHall)
 	hallordersTx := make(chan ConfigFile.ConsensusHall)
-	go Transmitter(ConfigFile.HallConesnsusPort, hallordersTx)
-	go Receiver(ConfigFile.HallConesnsusPort, hallordersRx)
+	go Transmitter(ConfigFile.HallConsensusPort, hallordersTx)
+	go Receiver(ConfigFile.HallConsensusPort, hallordersRx)
 	transmittTimer := time.NewTicker(time.Millisecond * 50).C
 
 	var LivingPeers []string
@@ -31,7 +31,7 @@ func ConsensusHall(ClearHallOrderChan chan [2]int, ConsensusHallChan chan Config
 		select {
 		case remoteHallConsensus := <-hallordersRx:
 			if !reflect.DeepEqual(remoteHallConsensus, localHallConsensus) {
-      //          fmt.Printf(ConfigFile.ColorCH+"[CH]:  New worldview: %v\n"+ConfigFile.ColorNone, remoteHallConsensus)
+               	fmt.Printf(ConfigFile.ColorCH+"[CH]:  New worldview: %v\n"+ConfigFile.ColorNone, remoteHallConsensus)
             }
 			RemoteID := remoteHallConsensus.ID
 			for floor := 0; floor < ConfigFile.Num_floors; floor++ {
@@ -50,7 +50,7 @@ func ConsensusHall(ClearHallOrderChan chan [2]int, ConsensusHallChan chan Config
 				}
 			}
             if !reflect.DeepEqual(remoteHallConsensus, localHallConsensus) {
-        //        fmt.Printf(ConfigFile.ColorCH+"[CH]:  Worldview updated: \n   From: %v\n   To:   %v\n"+ConfigFile.ColorNone, remoteHallConsensus, localHallConsensus)
+                fmt.Printf(ConfigFile.ColorCH+"[CH]:  Worldview updated: \n   From: %v\n   To:   %v\n"+ConfigFile.ColorNone, remoteHallConsensus, localHallConsensus)
             }
 
 		case ClearedHallOrder := <- ClearHallOrderChan:

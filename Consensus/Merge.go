@@ -17,15 +17,15 @@ func Merge(local *ConfigFile.OrderStatus, remote ConfigFile.OrderStatus, RemoteI
 				break
 			case ConfigFile.Inactive:
 				local.OrderState = ConfigFile.Inactive
-				local.AckdBy = local.AckdBy[:0] // destroy
+				local.AckdBy = local.AckdBy[:0]
 				break
 			case ConfigFile.PendingAck:
 				local.OrderState = ConfigFile.PendingAck
-				local.AckdBy = append(remote.AckdBy, ConfigFile.LocalID) // bør det være local.AckdBy = append(remote.AckdBy, ConfigFile.LocalID) her? -> anders: local.ackdBy = remote.ackdBy ~ [localId];
+				local.AckdBy = append(remote.AckdBy, ConfigFile.LocalID)
 				break
 			case ConfigFile.Active:
 				local.OrderState = ConfigFile.Active
-				local.AckdBy = append(remote.AckdBy, ConfigFile.LocalID) // Anders  local.ackdBy = remote.ackdBy ~ [localId];
+				local.AckdBy = append(remote.AckdBy, ConfigFile.LocalID)
 				onActive()
 			}
 		}
@@ -38,10 +38,10 @@ func Merge(local *ConfigFile.OrderStatus, remote ConfigFile.OrderStatus, RemoteI
 			break
 		case ConfigFile.PendingAck:
 			local.OrderState = remote.OrderState
-			local.AckdBy = append(remote.AckdBy, ConfigFile.LocalID) // adder egen ACK ANDERS: local.ackdBy = remote.ackdBy ~ [localId];
+			local.AckdBy = append(remote.AckdBy, ConfigFile.LocalID)
 			break
 		case ConfigFile.Active:
-			break // cannot skip PendingAck-state
+			break 
 		}
 
 	case ConfigFile.PendingAck:
@@ -55,8 +55,6 @@ func Merge(local *ConfigFile.OrderStatus, remote ConfigFile.OrderStatus, RemoteI
 			local.AckdBy = append(remote.AckdBy, ConfigFile.LocalID)
 			sort.Strings(local.AckdBy)
 			local.AckdBy = removeDuplicates(local.AckdBy)
-//			local.AckdBy = append(local.AckdBy, temp)  // legger til alle andre..? ANDERS:  local.ackdBy ~= remote.ackdBy ~ [localId];
-			//if len(local.AckdBy) >= len(LivingPeers) { // denne må selvsagt byttes til en "dynamisk" sak, og ikke bare sjekker antall!
 			if checkAcks(local.AckdBy, LivingPeers){
 				local.OrderState = ConfigFile.Active
 				onActive()
@@ -65,8 +63,6 @@ func Merge(local *ConfigFile.OrderStatus, remote ConfigFile.OrderStatus, RemoteI
 
 		case ConfigFile.Active:
 			local.OrderState = ConfigFile.Active
-//			temp := append(remote.AckdBy, ConfigFile.LocalID)
-//			local.AckdBy = append(local.AckdBy, temp)
 			local.AckdBy = append(remote.AckdBy, ConfigFile.LocalID)
 			onActive()
 			break
@@ -79,7 +75,7 @@ func Merge(local *ConfigFile.OrderStatus, remote ConfigFile.OrderStatus, RemoteI
 			break
 		case ConfigFile.Inactive:
 			local.OrderState = remote.OrderState
-			local.AckdBy = local.AckdBy[:0] // destroy
+			local.AckdBy = local.AckdBy[:0]
 			onInactive()
 			break
 
@@ -87,8 +83,6 @@ func Merge(local *ConfigFile.OrderStatus, remote ConfigFile.OrderStatus, RemoteI
 			break
 
 		case ConfigFile.Active:
-			//temp := append(remote.AckdBy, ConfigFile.LocalId)
-			//local.AckdBy = append(local.AckdBy, temp)
 			local.AckdBy = append(remote.AckdBy, ConfigFile.LocalID)
 			break
 
@@ -113,36 +107,26 @@ func Activate(local *ConfigFile.OrderStatus){
 
 func Deactivate(local *ConfigFile.OrderStatus, LivingPeers []string){
 	if len(LivingPeers) == 0 || (len(LivingPeers) == 1  &&  LivingPeers[0] == ConfigFile.LocalID) {
-		// Only us or "noone" on the network
-		local.OrderState = ConfigFile.Inactive 																// SE MEG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! VVIKTIG(litt) endret til default
+		local.OrderState = ConfigFile.Default		// mulig error
 	} else {
 		local.OrderState = ConfigFile.Inactive
 	}
 	local.AckdBy = local.AckdBy[:0]
 }
 
-
-
-
 func removeDuplicates(elements []string) []string {
-    // Use map to record duplicates as we find them.
     encountered := map[string]bool{}
     result := []string{}
 
     for v := range elements {
         if encountered[elements[v]] == true {
-            // Do not add duplicate.
         } else {
-            // Record this element as an encountered element.
             encountered[elements[v]] = true
-            // Append to result slice.
             result = append(result, elements[v])
         }
     }
-    // Return the new slice.
     return result
 }
-
 
 func checkAcks(acks []string, LivingPeers []string) bool{
 	if (len(acks) >= len(LivingPeers)) && (LivingPeers != nil){

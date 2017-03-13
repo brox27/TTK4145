@@ -10,7 +10,7 @@ import (
 //StateChan := make(chan ConfigFile.Elev)									// Fra FSM.go til StateFileNotYetMade
 //ElevatorStatesChan := make(chan map[string]*ConfigFile.Elev)		// Fra ElevatorStates til HallReqAss
 
-func DoSomethingSmart(StateChan chan ConfigFile.Elev, ElevatorStatesChan chan map[string]*ConfigFile.Elev) {
+func ElevatorStatesCoordinator(StateChan chan ConfigFile.Elev, ElevatorStatesChan chan map[string]*ConfigFile.Elev) {
 	// tar inn ELEV struct fra StateChan -> sender "noe" på NW
 	//						-> sender "noe" til HallReqAss på ElevatorStatesChan
 	StateNetworkRx := make(chan map[string]*ConfigFile.Elev)
@@ -25,7 +25,6 @@ func DoSomethingSmart(StateChan chan ConfigFile.Elev, ElevatorStatesChan chan ma
 		select {
 		case newLocalState := <-StateChan:
 			AllStates[ConfigFile.LocalID] = &newLocalState
-			//Printf("states sier local: %+v\n", AllStates)
 			ElevatorStatesChan <- AllStates
 
 		case newRemoteStates := <-StateNetworkRx:

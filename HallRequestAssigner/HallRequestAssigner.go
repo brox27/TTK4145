@@ -1,4 +1,4 @@
-package HallRequestAssigner
+package hallRequestAssigner
 
 import (
 	"../ConfigFile"
@@ -19,7 +19,7 @@ type AssignerCompatibleElev struct {
 }
 
 type AssignerCompatibleInput struct {
-	HallRequests [4][2]bool 								`json:"hallRequests"` 												// hvorfor kan ikke denne settes som "tom" slice e.g. [][] >> [4][2]
+	HallRequests [4][2]bool 								`json:"hallRequests"` 
 	States       map[string]*AssignerCompatibleElev			`json:"states"`
 }
 
@@ -51,7 +51,7 @@ func toAssignerCompatible(elev *ConfigFile.Elev) AssignerCompatibleElev {
 }
 
 
-func HallReq(
+func HallRequestAssigner(
 	ConsensusHallChan chan ConfigFile.ConsensusHall,
 	ConsensusCabChan chan map[string]*ConfigFile.ConsensusCab,
 	ElevatorStatesChan chan map[string]*ConfigFile.Elev,
@@ -63,15 +63,10 @@ func HallReq(
 	localCopy := AssignerCompatibleInput{}
 	localCopy.States = make(map[string]*AssignerCompatibleElev)
 	localCopy.States[ConfigFile.LocalID] = &AssignerCompatibleElev{}
-//	localCope.States
-	//var LastSentToFSM [ConfigFile.Num_floors][3]bool // hvorfor skrev vi 2???			TRENGER VI DENNE OM VI SPAMMER???
-	//go tester(LocalOrdersChan)
 
 	for {
-	//	fmt.Printf("\n \n NEW ROUND! \n")
 		select {
 		case newConsensusHall := <-ConsensusHallChan:
-			fmt.Printf("new Hall \n")
 			for button := 0; button < 2; button++ {
 				for floor := 0; floor < ConfigFile.Num_floors; floor++ {
 					if newConsensusHall.HallButtons[floor][button].OrderState == ConfigFile.Active {
@@ -83,7 +78,6 @@ func HallReq(
 			}
 
 		case newConsensusCab := <-ConsensusCabChan:
-			fmt.Printf("new CAB \n")
 			for elevID := range newConsensusCab {
 				if _, ok := localCopy.States[elevID]; ok {
 					for floor := 0; floor < ConfigFile.Num_floors; floor++ {
@@ -95,10 +89,8 @@ func HallReq(
 					}
 				}
 			}
-			fmt.Printf("ferdig CC \n")
 
 		case newElevatorStates := <-ElevatorStatesChan:
-		//	fmt.Printf("new STATE \n")
 			for elevID := range newElevatorStates {
 				if (elevID!=""){
 					if _, ok := localCopy.States[elevID]; ok {
@@ -106,15 +98,12 @@ func HallReq(
 						localCopy.States[elevID].Floor = toAssignerCompatible(newElevatorStates[elevID]).Floor
 						localCopy.States[elevID].Direction = toAssignerCompatible(newElevatorStates[elevID]).Direction
 					}
-				//temp := toAssignerCompatible(newElevatorStates[elevID])
-//				localCopy.States[elevID] = &temp
 				}
 			}
 
 		case PeerUpdate := <- FromPeersToHallReqAss:
 			fmt.Printf("Peer status %+v \n",PeerUpdate )
 			LostPeers = PeerUpdate.Lost
-			// legger til?
 			if _, ok := localCopy.States[PeerUpdate.New]; !ok {
 				localCopy.States[PeerUpdate.New] = &AssignerCompatibleElev{}
 
@@ -124,37 +113,24 @@ func HallReq(
 				temp[ConfigFile.LocalID]=localCopy.States[ConfigFile.LocalID]
 				for _, elevID := range PeerUpdate.Peers{
 					temp[elevID]=localCopy.States[elevID]
-					fmt.Printf("\n inne PeerUpdate ser den nye temp slik ut: \n %+v \n", temp[elevID])
 				}
 				localCopy.States=temp
-
-				/*
-            	for _, elevID := range LostPeers{
-            		delete(localCopy.States, elevID)
-                	fmt.Printf("%+v\n", localCopy)
-            	}
-            	*/
         	}
 		}
 
 
+		fmt.Printf(ConfigFile.ColorHRA+"[HRA]: local copy:\n"+ConfigFile.ColorNone)
+        fmt.Printf(ConfigFile.ColorHRA+"   HallRequests : %+v\n"+ConfigFile.ColorNone, localCopy.HallRequests)
+        fmt.Printf(ConfigFile.ColorHRA+"   States : \n"+ConfigFile.ColorNone)
 
-	//	fmt.Printf(ConfigFile.ColorHRA+"[HRA]: local copy:\n"+ConfigFile.ColorNone)
-    //    fmt.Printf(ConfigFile.ColorHRA+"   HallRequests : %+v\n"+ConfigFile.ColorNone, localCopy.HallRequests)
-   //     fmt.Printf(ConfigFile.ColorHRA+"   States : \n"+ConfigFile.ColorNone)
-       // for e := range localCopy.States {
-   //         fmt.Printf(ConfigFile.ColorHRA+"     %v : %+v\n"+ConfigFile.ColorNone, e, localCopy.States[e])
-    //    }
+        for e := range localCopy.States {
+            fmt.Printf(ConfigFile.ColorHRA+"     %v : %+v\n"+ConfigFile.ColorNone, e, localCopy.States[e])
+        }
 
-        // sjekke og evt. ta ut de som ikke lever \\
-        
-
-       // fmt.Printf("her da\n")
         arg, _ := json.Marshal(localCopy)
         dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
-//		fmt.Printf("sender inn:     %+v\n", string(arg) )
         result, err := exec.Command("sh","-c", dir+"/HALL --input '" + string(arg) + "'").Output()
-//		fmt.Printf("tilbake:   %+v\n%  +v\n\n", err, string(result) )
+
         if err == nil {
             var a map[string][][]bool
             json.Unmarshal(result, &a)
@@ -173,6 +149,6 @@ func HallReq(
             LocalOrdersChan <- assignedOrders
         }else{
             fmt.Printf("err : %+v : %+v\n", err, result)
-        }
+        }        
     }
 }

@@ -1,49 +1,27 @@
 package FSM
 
 import (
-	. "../driver"
+	"../driver"
 	"../ConfigFile"
 	"fmt"
-	//	"runtime"
 	"time"
 )
 
-/*
-func main() {
-	InitElev()
-	println("
-		░░░░░░░░░░░░░░░░░░░░░ \n
-		░░░░░░░░░░░░▄▀▀▀▀▄░░░ \n
-		░░░░░░░░░░▄▀░░▄░▄░█░░ \n
-		░▄▄░░░░░▄▀░░░░▄▄▄▄█░░ \n
-		█░░▀▄░▄▀░░░░░░░░░░█░░ \n
-		░▀▄░░▀▄░░░░█░░░░░░█░░ \n
-		░░░▀▄░░▀░░░█░░░░░░█░░ \n
-		░░░▄▀░░░░░░█░░░░▄▀░░░ \n
-		░░░▀▄▀▄▄▀░░█▀░▄▀░░░░░ \n
-		░░░░░░░░█▀▀█▀▀░░░░░░░ \n
-		░░░░░░░░▀▀░▀▀░░░░░░░░ \n")
-
-
-	RUN(localId)
-}
-*/
 
 func RUN(
 	FloorChan chan int, StateChan chan ConfigFile.Elev,
 	LocalOrdersChan chan [][]bool,
 	ClearHallOrdersChan chan [2]int, ClearCabOrderChan chan int, TransmitEnable chan bool) {
 
-
-	defer SetMotorDirection(ConfigFile.NEUTRAL)
 	LocalElev := ConfigFile.NewElev()
 	var doorTimerChan <-chan time.Time
-	var OrderTimedOut <- chan time.Time
+	var orderTimerChan <- chan time.Time
 
+	// Init phase \\ -Anders <3
 	{
-		f := GetFloorSensorSignal()
-		if f == -1 {
-			SetMotorDirection(ConfigFile.DOWN)
+		floor := driver.GetFloorSensorSignal()
+		if floor == -1 {
+			driver.SetMotorDirection(ConfigFile.DOWN)
 			LocalElev.State = ConfigFile.INITIALIZE
 		}
 	}
@@ -54,12 +32,12 @@ func RUN(
 			fmt.Printf("New floor: %+v\n", newFloor)
 			LocalElev.Floor = newFloor
 			StateChan <- LocalElev
-			SetFloorLight(newFloor) // oppdatere mtp 1 indeksering **********************code quality************************************************************
+			driver.SetFloorLight(newFloor)
 
 			switch LocalElev.State {
 
 			case ConfigFile.INITIALIZE:
-				SetMotorDirection(ConfigFile.NEUTRAL)
+				driver.SetMotorDirection(ConfigFile.NEUTRAL)
 				LocalElev.State = ConfigFile.IDLE
 				LocalElev.Direction = ConfigFile.NEUTRAL
 				break
@@ -69,27 +47,23 @@ func RUN(
 
 			case ConfigFile.RUNNING:
 				if ordersAbove(LocalElev) || ordersBelow(LocalElev){
-					fmt.Printf("\n**********************************************Started timer*************************************************'\n")
-					OrderTimedOut = time.After(15*time.Second)
+					orderTimerChan = time.After(15*time.Second)
 				}
 				if shouldStop(LocalElev) { // se over, kan ha noen mangler, eks. når heisen allerede står i etg hvor det bestilles
 					for button := 0; button < ConfigFile.Num_buttons; button++ {
 						if LocalElev.Orders[LocalElev.Floor][button] {
-							fmt.Printf("new floor in running treffer starten!! \n")
 							if button < ConfigFile.Num_buttons-1 {
-								fmt.Printf("new floor in running treffer clear hall \n")
 								ClearHallOrdersChan <- [2]int{LocalElev.Floor, button}
 							} else {
-								fmt.Printf("new floor in running treffer clear cab \n")
 								ClearCabOrderChan <- LocalElev.Floor
 							}
 						}
 					}
-					SetMotorDirection(ConfigFile.NEUTRAL)
-					//LocalElev.Direction=ConfigFile.NEUTRAL
+
+					driver.SetMotorDirection(ConfigFile.NEUTRAL)
 					doorTimerChan = time.After(3*time.Second)
 					fmt.Printf("Door open\n")
-					SetDoorOpenLamp(1)
+					driver.SetDoorOpenLamp(1)
 					LocalElev.State = ConfigFile.DOORSOPEN
 					StateChan <- LocalElev
 					break
@@ -101,28 +75,26 @@ func RUN(
 
 
 		case newOrders := <-LocalOrdersChan:
-			fmt.Printf("new orders: %+v\n",newOrders )
 			switch LocalElev.State {
-
 			case ConfigFile.INITIALIZE:
 				break
 
 			case ConfigFile.IDLE:
 				if hasNewOrders(newOrders, LocalElev){
-					fmt.Printf("\n**********************************************Started timer*************************************************'\n")
-					OrderTimedOut = time.After(15*time.Second)
+					orderTimerChan = time.After(15*time.Second)
 				}
 				LocalElev.Orders = newOrders
+
 				if nextDirection(LocalElev) != ConfigFile.NEUTRAL {
 					LocalElev.State = ConfigFile.RUNNING
 					LocalElev.Direction = nextDirection(LocalElev)
-					SetMotorDirection(LocalElev.Direction)
+					driver.SetMotorDirection(LocalElev.Direction)
 					StateChan <- LocalElev
 				}else{
 					for button := 0; button < ConfigFile.Num_buttons; button++ {
 						if LocalElev.Orders[LocalElev.Floor][button] {
 							doorTimerChan = time.After(3*time.Second)
-							SetDoorOpenLamp(1)
+							driver.SetDoorOpenLamp(1)
 							LocalElev.State = ConfigFile.DOORSOPEN
 							if button < ConfigFile.Num_buttons-1 {
 								ClearHallOrdersChan <- [2]int{LocalElev.Floor, button}
@@ -131,25 +103,21 @@ func RUN(
 							}
 						}
 					}
-
 				}
 				break
 
 			case ConfigFile.RUNNING:
 				if hasNewOrders(newOrders, LocalElev){
-					fmt.Printf("\n**********************************************Started timer*************************************************'\n")
-					OrderTimedOut = time.After(15*time.Second)
+					orderTimerChan = time.After(15*time.Second)
 				}
 				LocalElev.Orders = newOrders
 				break
 
 			case ConfigFile.DOORSOPEN:
 				if hasNewOrders(newOrders, LocalElev){
-					fmt.Printf("\n**********************************************Started timer*************************************************'\n")
-					OrderTimedOut = time.After(15*time.Second)
+					orderTimerChan = time.After(15*time.Second)
 				}
 				LocalElev.Orders = newOrders
-				// if order at this floor, keep door open longer?
 				break
 			}
 
@@ -167,48 +135,32 @@ func RUN(
 				break
 
 			case ConfigFile.DOORSOPEN:
-				SetDoorOpenLamp(0)
+				driver.SetDoorOpenLamp(0)
 				LocalElev.Direction = nextDirection(LocalElev)
 
 				if LocalElev.Direction != ConfigFile.NEUTRAL {
 					LocalElev.State = ConfigFile.RUNNING
-					SetMotorDirection(LocalElev.Direction)
+					driver.SetMotorDirection(LocalElev.Direction)
 					StateChan <- LocalElev
 				} else {
 					LocalElev.State = ConfigFile.IDLE
 					StateChan<-LocalElev
 				}
 				break
+			}
 
-				}
-		case <- OrderTimedOut:
+		case <- orderTimerChan:
 			if(LocalElev.State != ConfigFile.IDLE){
-				fmt.Printf("**********************Timed out***********************\n")
-				fmt.Printf("******************************************************\n")
-				fmt.Printf("******************************************************\n")
-				fmt.Printf("******************************************************\n")
-				fmt.Printf("******************************************************\n")
-				fmt.Printf("******************************************************\n")
-				fmt.Printf("******************************************************\n")
-				fmt.Printf("******************************************************\n")
-				fmt.Printf("***************************fdfsdf**************************\n")
-				fmt.Printf("******************************************************\n")
-				fmt.Printf("******************************************************\n")
-				fmt.Printf("******************************************************\n")
-				fmt.Printf("******************************************************\n")
-				fmt.Printf("******************************************************\n")
-				fmt.Printf("******************************************************\n")
 				TransmitEnable <- false
-				SetMotorDirection(ConfigFile.NEUTRAL)
+				driver.SetMotorDirection(ConfigFile.NEUTRAL)
 				time.Sleep(20* time.Second)
 				TransmitEnable <- true
-				SetMotorDirection(LocalElev.Direction)
+				driver.SetMotorDirection(LocalElev.Direction)
 			}
+
 		}
 	}
 }
-
-
 
 func nextDirection(LocalElev ConfigFile.Elev) ConfigFile.Direction {
 	if LocalElev.Direction == ConfigFile.UP {
@@ -235,9 +187,9 @@ func nextDirection(LocalElev ConfigFile.Elev) ConfigFile.Direction {
 
 func ordersAbove(LocalElev ConfigFile.Elev) bool {
 	floor := LocalElev.Floor+1
-	for i := floor; i < ConfigFile.Num_floors; i++ {
-		for j := 0; j < ConfigFile.Num_buttons; j++ {
-			if LocalElev.Orders[i][j] != false{
+	for f := floor; f < ConfigFile.Num_floors; f++ {
+		for b := 0; b < ConfigFile.Num_buttons; b++ {
+			if LocalElev.Orders[f][b] != false{
 				return true
 			}
 		}
@@ -247,9 +199,9 @@ func ordersAbove(LocalElev ConfigFile.Elev) bool {
 
 func ordersBelow(LocalElev ConfigFile.Elev) bool {
 	floor := LocalElev.Floor-1
-	for i := floor; i >= 0; i-- {
-		for j := 0; j < ConfigFile.Num_buttons; j++ {
-			if LocalElev.Orders[i][j] != false {
+	for f := floor; f >= 0; f-- {
+		for b := 0; b < ConfigFile.Num_buttons; b++ {
+			if LocalElev.Orders[f][b] != false {
 				return true
 			}
 		}
@@ -278,16 +230,12 @@ func shouldStop(LocalElev ConfigFile.Elev) bool {
 
 
 func hasNewOrders(newOrders [][]bool, LocalElev ConfigFile.Elev) bool{
-	fmt.Printf("vi tester has new orders ############################################################## \n")
 	for f := 0; f < ConfigFile.Num_floors; f++{
 		for b := 0; b < ConfigFile.Num_buttons; b++{
-			fmt.Printf("floor %+v button: %+v da sier NO %+v og local %+v \n", f, b, newOrders[f][b], LocalElev.Orders[f][b])
 			if (LocalElev.Orders[f][b] != newOrders[f][b]){
-				fmt.Printf("score \n")
 				return true
 			}
 		}
 	}
-	fmt.Printf("vi drar tilbake uten score \n")
 	return false
 }
