@@ -41,7 +41,7 @@ func main() {
 	// ** starte GO routines ** \\
 	go driver.ButtonPoll(HallButtonChan, CabButtonChan)
 	go driver.FloorPoll(FloorChan)
-	go FSM.RUN(FloorChan, StateChan, LocalOrdersChan, ClearHallOrderChan, ClearCabOrderChan)
+	go FSM.RUN(FloorChan, StateChan, LocalOrdersChan, ClearHallOrderChan, ClearCabOrderChan, TransmitEnable)
 	go Consensus.ConsensusHall(ClearHallOrderChan, ConsensusHallChan, HallButtonChan, FromPeersToConsensusHall)
 	go Consensus.ConsensusCab(ClearCabOrderChan, ConsensusCabChan, CabButtonChan, FromPeersToConsensusCab)
 	go ElevatorStates.DoSomethingSmart(StateChan, ElevatorStatesChan)

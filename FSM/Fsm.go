@@ -32,12 +32,13 @@ func main() {
 func RUN(
 	FloorChan chan int, StateChan chan ConfigFile.Elev,
 	LocalOrdersChan chan [][]bool,
-	ClearHallOrdersChan chan [2]int, ClearCabOrderChan chan int) {
+	ClearHallOrdersChan chan [2]int, ClearCabOrderChan chan int, TransmitEnable chan bool) {
 
 
 	defer SetMotorDirection(ConfigFile.NEUTRAL)
 	LocalElev := ConfigFile.NewElev()
 	var doorTimerChan <-chan time.Time
+	var OrderTimedOut <- chan time.Time
 
 	{
 		f := GetFloorSensorSignal()
@@ -67,6 +68,9 @@ func RUN(
 				break
 
 			case ConfigFile.RUNNING:
+				if ordersAbove(LocalElev) || ordersBelow(LocalElev){
+					OrderTimedOut = time.After(10*time.Second)
+				}
 				if shouldStop(LocalElev) { // se over, kan ha noen mangler, eks. når heisen allerede står i etg hvor det bestilles
 					for button := 0; button < ConfigFile.Num_buttons; button++ {
 						if LocalElev.Orders[LocalElev.Floor][button] {
@@ -127,7 +131,6 @@ func RUN(
 				break
 
 			case ConfigFile.RUNNING:
-
 				LocalElev.Orders = newOrders
 				break
 
@@ -163,6 +166,28 @@ func RUN(
 					StateChan<-LocalElev
 				}
 				break
+
+				}
+		case <- OrderTimedOut:
+			if(LocalElev.State != ConfigFile.IDLE){
+				fmt.Printf("******************************************************\n")
+				fmt.Printf("******************************************************\n")
+				fmt.Printf("******************************************************\n")
+				fmt.Printf("******************************************************\n")
+				fmt.Printf("******************************************************\n")
+				fmt.Printf("******************************************************\n")
+				fmt.Printf("******************************************************\n")
+				fmt.Printf("******************************************************\n")
+				fmt.Printf("******************************************************\n")
+				fmt.Printf("******************************************************\n")
+				fmt.Printf("******************************************************\n")
+				fmt.Printf("******************************************************\n")
+				fmt.Printf("******************************************************\n")
+				fmt.Printf("******************************************************\n")
+				fmt.Printf("******************************************************\n")
+				TransmitEnable <- false
+				time.Sleep(20* time.Second)
+				TransmitEnable <- true
 			}
 		}
 	}
