@@ -59,6 +59,19 @@ func main() {
 	select {
 		case <- osSignal:
 			println("Interrupt detected, shutting down motor")
+			println("Interrupt detected, shutting down motor")
+			println("Interrupt detected, shutting down motor")
+			println("Interrupt detected, shutting down motor")
+			println("Interrupt detected, shutting down motor")
+			println("Interrupt detected, shutting down motor")
+			println("In****************************************************************************************************************************************************or")
+			println("Interrupt detected, shutting down motor")
+			println("Interrupt detected, shutting down motor")
+			println("Interrupt detected, shutting down motor")
+			println("Interrupt detected, shutting down motor")
+			println("Interrupt detected, shutting down motor")
+			println("Interrupt detected, shutting down motor")
+			println("Interrupt detected, shutting down motor")
 			driver.SetMotorDirection(ConfigFile.NEUTRAL)
 	}
 }

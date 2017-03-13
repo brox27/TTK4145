@@ -102,13 +102,9 @@ func HallRequestAssigner(
 						tempCopy := newElevatorStates[elevID]
 						newCopy := toAssignerCompatible(*tempCopy)
 						localCopy.Lock()
-						fmt.Printf("*HRA in if 2, 2\n")
 						localCopy.States[elevID].Behaviour = newCopy.Behaviour
-						fmt.Printf("*HRA in if 2, 3\n")
 						localCopy.States[elevID].Floor = newCopy.Floor
-						fmt.Printf("*HRA in if 2, 4\n")
 						localCopy.States[elevID].Direction = newCopy.Direction
-						fmt.Printf("*HRA in if 2, 5\n")
 						localCopy.Unlock()
 					}
 				}

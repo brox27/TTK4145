@@ -11,7 +11,7 @@ func Merge(local *ConfigFile.OrderStatus, remote ConfigFile.OrderStatus, RemoteI
 	switch local.OrderState {
 
 	case ConfigFile.Default:
-		if RemoteID != ConfigFile.LocalID {
+	//	if RemoteID != ConfigFile.LocalID {
 			switch remote.OrderState {
 			case ConfigFile.Default:
 				break
@@ -27,7 +27,7 @@ func Merge(local *ConfigFile.OrderStatus, remote ConfigFile.OrderStatus, RemoteI
 				local.OrderState = ConfigFile.Active
 				local.AckdBy = append(remote.AckdBy, ConfigFile.LocalID)
 				onActive()
-			}
+		//	}
 		}
 
 	case ConfigFile.Inactive:

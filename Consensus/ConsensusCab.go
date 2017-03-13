@@ -42,7 +42,9 @@ func ConsensusCab(ClearCabOrderChan chan int, ConsensusCabChan chan map[string]*
 											
 				for floor := 0; floor < ConfigFile.Num_floors; floor++ {
 
+
 					remote := remoteCabConsensus[elevID].CabButtons[floor]
+					fmt.Printf("på f: %+v : %+v merges med %+v, Min status: %+v remote: %+v \n", floor, ConfigFile.LocalID, elevID,AllCabOrders[elevID].CabButtons[floor], remote)
 					Merge(&AllCabOrders[elevID].CabButtons[floor], remote, elevID, LivingPeers, 
 						func() {
 							if elevID == ConfigFile.LocalID {
@@ -55,12 +57,13 @@ func ConsensusCab(ClearCabOrderChan chan int, ConsensusCabChan chan map[string]*
 							fmt.Printf("%+v completed a CAB order at floor %+v \n", elevID, floor)
 							ConsensusCabChan <- AllCabOrders
 						})
+					fmt.Printf("Merge resultat; %+v\n", AllCabOrders[elevID].CabButtons[floor])
 				}
 
 				if !reflect.DeepEqual(remoteCabConsensus[elevID], AllCabOrders[elevID]) {
                     fmt.Printf(ConfigFile.ColorCC+"[CC]:  Worldview updated: \n   From: %v\n   To:   %v\n"+ConfigFile.ColorNone, remoteCabConsensus[elevID], AllCabOrders[elevID])
                 }
-                fmt.Printf("*CC end of remoteCabConsensus channel \n")
+                //fmt.Printf("*CC end of remoteCabConsensus channel \n")
 			}
 
 		case ClearedCabOrder := <- ClearCabOrderChan:
