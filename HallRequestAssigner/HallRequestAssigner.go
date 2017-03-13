@@ -100,13 +100,15 @@ func HallReq(
 		case newElevatorStates := <-ElevatorStatesChan:
 			fmt.Printf("new STATE \n")
 			for elevID := range newElevatorStates {
-				if _, ok := localCopy.States[elevID]; ok {
-					localCopy.States[elevID].Behaviour = toAssignerCompatible(newElevatorStates[elevID]).Behaviour
-					localCopy.States[elevID].Floor = toAssignerCompatible(newElevatorStates[elevID]).Floor
-					localCopy.States[elevID].Direction = toAssignerCompatible(newElevatorStates[elevID]).Direction
-				}
+				if (elevID!=""){
+					if _, ok := localCopy.States[elevID]; ok {
+						localCopy.States[elevID].Behaviour = toAssignerCompatible(newElevatorStates[elevID]).Behaviour
+						localCopy.States[elevID].Floor = toAssignerCompatible(newElevatorStates[elevID]).Floor
+						localCopy.States[elevID].Direction = toAssignerCompatible(newElevatorStates[elevID]).Direction
+					}
 				//temp := toAssignerCompatible(newElevatorStates[elevID])
 //				localCopy.States[elevID] = &temp
+				}
 			}
 
 		case PeerUpdate := <- FromPeersToHallReqAss:
@@ -116,7 +118,20 @@ func HallReq(
 			if _, ok := localCopy.States[PeerUpdate.New]; !ok {
 				localCopy.States[PeerUpdate.New] = &AssignerCompatibleElev{}
 			}
+			if LostPeers != nil{
+				temp := make (map[string]*AssignerCompatibleElev)
+				for _, elevID := range PeerUpdate.Peers{
+					temp[elevID]=localCopy.States[elevID]
+				}
+				localCopy.States=temp
 
+				/*
+            	for _, elevID := range LostPeers{
+            		delete(localCopy.States, elevID)
+                	fmt.Printf("%+v\n", localCopy)
+            	}
+            	*/
+        	}
 		}
 
 
@@ -129,11 +144,7 @@ func HallReq(
         }
 
         // sjekke og evt. ta ut de som ikke lever \\
-        if LostPeers != nil{
-            for _, elevID := range LostPeers{
-                delete(localCopy.States, elevID)
-            }
-        }
+        
 
         fmt.Printf("her da\n")
         arg, _ := json.Marshal(localCopy)
