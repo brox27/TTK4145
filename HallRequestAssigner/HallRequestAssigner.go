@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"os/exec"
+	"sync"
 	"os"
 )
 
@@ -19,6 +20,7 @@ type AssignerCompatibleElev struct {
 }
 
 type AssignerCompatibleInput struct {
+	sync.RWMutex											`json:"-"`
 	HallRequests [4][2]bool 								`json:"hallRequests"` 
 	States       map[string]*AssignerCompatibleElev			`json:"states"`
 }
@@ -99,6 +101,7 @@ func HallRequestAssigner(
 					if _, ok := annotherCopy[elevID]; ok{
 						tempCopy := newElevatorStates[elevID]
 						newCopy := toAssignerCompatible(*tempCopy)
+						localCopy.Lock()
 						fmt.Printf("*HRA in if 2, 2\n")
 						localCopy.States[elevID].Behaviour = newCopy.Behaviour
 						fmt.Printf("*HRA in if 2, 3\n")
@@ -106,6 +109,7 @@ func HallRequestAssigner(
 						fmt.Printf("*HRA in if 2, 4\n")
 						localCopy.States[elevID].Direction = newCopy.Direction
 						fmt.Printf("*HRA in if 2, 5\n")
+						localCopy.Unlock()
 					}
 				}
 			}
