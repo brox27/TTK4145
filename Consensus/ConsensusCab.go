@@ -52,11 +52,11 @@ func ConsensusCab(ClearCabOrderChan chan int, ConsensusCabChan chan map[string]*
 							}
 						}, 
 						func() {
-							fmt.Println("%+v completed a CAB order at floor %+v\n", elevID, floor)
+							fmt.Printf("%+v completed a CAB order at floor %+v \n", elevID, floor)
 							ConsensusCabChan <- AllCabOrders
 						})
 				}
-				
+
 				if !reflect.DeepEqual(remoteCabConsensus[elevID], AllCabOrders[elevID]) {
                     fmt.Printf(ConfigFile.ColorCC+"[CC]:  Worldview updated: \n   From: %v\n   To:   %v\n"+ConfigFile.ColorNone, remoteCabConsensus[elevID], AllCabOrders[elevID])
                 }
