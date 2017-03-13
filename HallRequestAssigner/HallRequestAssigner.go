@@ -3,7 +3,7 @@ package hallRequestAssigner
 import (
 	"../ConfigFile"
 	"encoding/json"
-	"reflect"
+	//"reflect"
 	"fmt"
 	"path/filepath"
 	"os/exec"
@@ -93,6 +93,22 @@ func HallRequestAssigner(
 			}
 
 		case newElevatorStates := <-ElevatorStatesChan:
+			for elevID := range newElevatorStates{
+				if elevID != ""{
+					if _, ok := localCopy.States[elevID]; ok{
+						tempCopy := newElevatorStates[elevID]
+						newCopy := toAssignerCompatible(*tempCopy)
+						fmt.Printf("*HRA in if 2, 2\n")
+						localCopy.States[elevID].Behaviour = newCopy.Behaviour
+						fmt.Printf("*HRA in if 2, 3\n")
+						localCopy.States[elevID].Floor = newCopy.Floor
+						fmt.Printf("*HRA in if 2, 4\n")
+						localCopy.States[elevID].Direction = newCopy.Direction
+						fmt.Printf("*HRA in if 2, 5\n")
+					}
+				}
+			}
+			/*
 			fmt.Printf("*HRA newElevatorStates\n")
 			if !reflect.DeepEqual(newElevatorStates, localCopy.States){
 				fmt.Printf("*HRA above for\n")
@@ -111,16 +127,13 @@ func HallRequestAssigner(
 						localCopy.States[elevID].Direction = temp.Direction
 						fmt.Printf("*HRA in if 2, 5\n")
 
-						/*
+			*/		
+				/*
 						localCopy.States[elevID].Behaviour
 						 = toAssignerCompatible(newElevatorStates[elevID]).Behaviour
 						localCopy.States[elevID].Floor = toAssignerCompatible(newElevatorStates[elevID]).Floor
 						localCopy.States[elevID].Direction = toAssignerCompatible(newElevatorStates[elevID]).Direction
 						*/
-					}
-				}
-			}
-		}
 
 		case PeerUpdate := <- FromPeersToHallReqAss:
 			fmt.Printf("Peer status %+v \n",PeerUpdate )
