@@ -134,7 +134,7 @@ func RUN(
 			case ConfigFile.RUNNING:
 				if hasNewOrders(newOrders, LocalElev){
 					fmt.Printf("\n**********************************************Started timer*************************************************'\n")
-					OrderTimedOut = time.After(10*time.Second)
+					OrderTimedOut = time.After(15*time.Second)
 				}
 				LocalElev.Orders = newOrders
 				break
@@ -190,7 +190,6 @@ func RUN(
 				fmt.Printf("******************************************************\n")
 				fmt.Printf("******************************************************\n")
 				fmt.Printf("******************************************************\n")
-				panic("oops")
 				TransmitEnable <- false
 				time.Sleep(20* time.Second)
 				TransmitEnable <- true
