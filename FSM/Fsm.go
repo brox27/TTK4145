@@ -70,9 +70,12 @@ func RUN(
 				if shouldStop(LocalElev) { // se over, kan ha noen mangler, eks. når heisen allerede står i etg hvor det bestilles
 					for button := 0; button < ConfigFile.Num_buttons; button++ {
 						if LocalElev.Orders[LocalElev.Floor][button] {
+							fmt.Printf("new floor in running treffer starten!! \n")
 							if button < ConfigFile.Num_buttons-1 {
+								fmt.Printf("new floor in running treffer clear hall \n")
 								ClearHallOrdersChan <- [2]int{LocalElev.Floor, button}
 							} else {
+								fmt.Printf("new floor in running treffer clear cab \n")
 								ClearCabOrderChan <- LocalElev.Floor
 							}
 						}
@@ -93,7 +96,7 @@ func RUN(
 
 
 		case newOrders := <-LocalOrdersChan:
-
+			fmt.Printf("new orders: %+v\n",newOrders )
 			switch LocalElev.State {
 
 			case ConfigFile.INITIALIZE:

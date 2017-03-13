@@ -29,11 +29,11 @@ func ButtonPoll(HallButtonChan chan [2]int, CabButtonChan chan int) {
 }
 
 func FloorPoll(FloorChan chan int) {
-	LastStatus := -2
+	LastStatus := -1
 	for {
 		floor := GetFloorSensorSignal()
 		if (floor != -1) && (floor != LastStatus) {
-			FloorChan <- floor-1
+			FloorChan <- floor
 		}
 		LastStatus = floor
 		//time.Sleep(5 * time.Millisecond)

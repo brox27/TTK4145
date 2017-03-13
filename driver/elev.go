@@ -81,6 +81,7 @@ func SetFloorLight(floor int) {
 }
 
 func SetDoorOpenLamp(value int) {
+	println("nu fucker vi med door open %+v", value)
 	if value == 1 {
 		Io_set_bit(LIGHT_DOOR_OPEN)
 	} else {
@@ -97,16 +98,16 @@ func GetButtonSignal(floor int, button int) int {
 
 func GetFloorSensorSignal() int {
 	if Io_read_bit(SENSOR_FLOOR1) != 0 {
-		return 1
+		return 0
 	}
 	if Io_read_bit(SENSOR_FLOOR2) != 0 {
-		return 2
+		return 1
 	}
 	if Io_read_bit(SENSOR_FLOOR3) != 0 {
-		return 3
+		return 2
 	}
 	if Io_read_bit(SENSOR_FLOOR4 ) != 0 {
-		return 4
+		return 3
 	} else {
 		return -1
 	}

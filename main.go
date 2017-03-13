@@ -25,11 +25,11 @@ func main() {
 	CabButtonChan := make(chan int)                                    	// Fra driver.go til ConsensusCab
 	ClearHallOrderChan := make(chan [2]int)                            	// Fra FSM.go til ConsensusHall
 	ClearCabOrderChan := make(chan int)                                	// Fra FSM.go til ConsensusCab
-	StateChan := make(chan ConfigFile.Elev)                            	// Fra FSM.go til StateFileNotYetMade
+	StateChan := make(chan ConfigFile.Elev,3)                            	// Fra FSM.go til StateFileNotYetMade
 	PeerUpdateChan := make(chan ConfigFile.PeerUpdate)                 	// Fra "egen NW modul fra Anders" Til ConsHall/ConsCab/HallReqAss
 	ConsensusCabChan := make(chan map[string]*ConfigFile.ConsensusCab) 	// Fra ConsensusCab til HallReqAss
 	ConsensusHallChan := make(chan ConfigFile.ConsensusHall)           	// Fra ConsensusHall til HallReqAss
-	ElevatorStatesChan := make(chan map[string]*ConfigFile.Elev)       	// Fra ElevatorStates til HallReqAss
+	ElevatorStatesChan := make(chan map[string]*ConfigFile.Elev,3)       	// Fra ElevatorStates til HallReqAss
 	TransmitEnable := make(chan bool)                                  	// Fra Peers til consensusCab/consensusHall/HallReqAss
 	LocalOrdersChan := make(chan [][]bool)							   	// Fra HallReqAss til FSM.go
 	FromPeersToConsensusHall := make(chan ConfigFile.PeerUpdate)
