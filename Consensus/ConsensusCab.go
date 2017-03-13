@@ -60,13 +60,16 @@ func ConsensusCab(ClearCabOrderChan chan int, ConsensusCabChan chan map[string]*
 				if !reflect.DeepEqual(remoteCabConsensus[elevID], AllCabOrders[elevID]) {
                     fmt.Printf(ConfigFile.ColorCC+"[CC]:  Worldview updated: \n   From: %v\n   To:   %v\n"+ConfigFile.ColorNone, remoteCabConsensus[elevID], AllCabOrders[elevID])
                 }
+                fmt.Printf("*CC end of remoteCabConsensus channel \n")
 			}
 
 		case ClearedCabOrder := <- ClearCabOrderChan:
 			fmt.Printf(ConfigFile.ColorCC+"[CC]:  Cleared cab order: %+v\n"+ConfigFile.ColorNone, ClearedCabOrder)
 			Deactivate(&AllCabOrders[ConfigFile.LocalID].CabButtons[ClearedCabOrder], LivingPeers)
 			driver.SetButtonLamp(ConfigFile.BUTTON_ORDER_COMMAND, ClearedCabOrder, 0)
+			fmt.Printf("*CC over ConsensusCabChan \n")
 			ConsensusCabChan <- AllCabOrders
+			fmt.Printf("*CC under ConsensusCabChan \n")
 
 		case NewCabButton := <-CabButtonChan:
 			fmt.Printf(ConfigFile.ColorCC+"[CC]:  New cab button: %+v\n"+ConfigFile.ColorNone, NewCabButton)

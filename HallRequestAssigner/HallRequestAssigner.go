@@ -67,6 +67,7 @@ func HallRequestAssigner(
 	for {
 		select {
 		case newConsensusHall := <-ConsensusHallChan:
+			fmt.Printf("*HRA newConsensusHall\n")
 			for button := 0; button < 2; button++ {
 				for floor := 0; floor < ConfigFile.Num_floors; floor++ {
 					if newConsensusHall.HallButtons[floor][button].OrderState == ConfigFile.Active {
@@ -78,6 +79,7 @@ func HallRequestAssigner(
 			}
 
 		case newConsensusCab := <-ConsensusCabChan:
+			fmt.Printf("*HRA newConsensusCab\n")
 			for elevID := range newConsensusCab {
 				if _, ok := localCopy.States[elevID]; ok {
 					for floor := 0; floor < ConfigFile.Num_floors; floor++ {
@@ -91,6 +93,7 @@ func HallRequestAssigner(
 			}
 
 		case newElevatorStates := <-ElevatorStatesChan:
+			fmt.Printf("*HRA newElevatorStates\n")
 			for elevID := range newElevatorStates {
 				if (elevID!=""){
 					if _, ok := localCopy.States[elevID]; ok {
