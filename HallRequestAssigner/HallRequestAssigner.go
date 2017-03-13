@@ -95,7 +95,8 @@ func HallRequestAssigner(
 		case newElevatorStates := <-ElevatorStatesChan:
 			for elevID := range newElevatorStates{
 				if elevID != ""{
-					if _, ok := localCopy.States[elevID]; ok{
+					annotherCopy := localCopy.States
+					if _, ok := annotherCopy[elevID]; ok{
 						tempCopy := newElevatorStates[elevID]
 						newCopy := toAssignerCompatible(*tempCopy)
 						fmt.Printf("*HRA in if 2, 2\n")
