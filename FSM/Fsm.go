@@ -185,6 +185,7 @@ func RUN(
 				fmt.Printf("******************************************************\n")
 				fmt.Printf("******************************************************\n")
 				fmt.Printf("******************************************************\n")
+				panic("oops")
 				TransmitEnable <- false
 				time.Sleep(20* time.Second)
 				TransmitEnable <- true
