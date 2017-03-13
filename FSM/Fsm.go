@@ -56,13 +56,13 @@ func RUN(
 					for button := 0; button < ConfigFile.Num_buttons; button++ {
 						if LocalElev.Orders[LocalElev.Floor][button] {
 							if button < ConfigFile.Num_buttons-1 {
-								fmt.Printf("*FSM above ClearHallOrdersChan NewFLOOR")
+								fmt.Printf("*FSM above ClearHallOrdersChan NewFLOOR\n")
 								ClearHallOrdersChan <- [2]int{LocalElev.Floor, button}
-								fmt.Printf("*FSM below ClearHallOrdersChan NewFLOOR")
+								fmt.Printf("*FSM below ClearHallOrdersChan NewFLOOR\n")
 							} else {
-								fmt.Printf("*FSM above ClearCabOrderChan NewFLOOR")
+								fmt.Printf("*FSM above ClearCabOrderChan NewFLOOR\n")
 								ClearCabOrderChan <- LocalElev.Floor
-								fmt.Printf("*FSM below ClearCabOrderChan NewFLOOR")
+								fmt.Printf("*FSM below ClearCabOrderChan NewFLOOR\n")
 							}
 						}
 					}
