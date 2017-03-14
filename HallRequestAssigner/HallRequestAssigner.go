@@ -94,13 +94,12 @@ func HallRequestAssigner(
 			for elevID := range newElevatorStates.StateMap {
 				if elevID != "" {
 					localCopy.Lock()
-					annotherCopy := localCopy.States
-					if _, ok := annotherCopy[elevID]; ok {
-						tempCopy := newElevatorStates.StateMap[elevID]
-						newCopy := toAssignerCompatible(*tempCopy)
-						localCopy.States[elevID].Behaviour = newCopy.Behaviour
-						localCopy.States[elevID].Floor = newCopy.Floor
-						localCopy.States[elevID].Direction = newCopy.Direction
+					//annotherCopy := localCopy.States
+					if _, ok := newElevatorStates.StateMap[elevID]; ok {
+						temp := toAssignerCompatible(*newElevatorStates.StateMap[elevID])
+						localCopy.States[elevID].Behaviour = temp.Behaviour
+						localCopy.States[elevID].Floor = temp.Floor
+						localCopy.States[elevID].Direction = temp.Direction
 
 					}
 					localCopy.Unlock()
