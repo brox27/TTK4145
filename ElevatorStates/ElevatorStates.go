@@ -16,6 +16,7 @@ func ElevatorStatesCoordinator(StateChan chan ConfigFile.Elev, ElevatorStatesCha
 
 	States := ConfigFile.AllStates{}
 	States.StateMap = make(map[string]*ConfigFile.Elev)
+	updateFlag := true
 
 	for {
 		select {
@@ -25,12 +26,18 @@ func ElevatorStatesCoordinator(StateChan chan ConfigFile.Elev, ElevatorStatesCha
 
 		case newRemoteStates := <-StateNetworkRx:
 			States.Lock()
+			newRemoteStates.Lock()
 			for elevID := range newRemoteStates.StateMap {
 				if elevID != ConfigFile.LocalID && States.StateMap[elevID] != newRemoteStates.StateMap[elevID] {
 					States.StateMap[elevID] = newRemoteStates.StateMap[elevID]
-					ElevatorStatesChan <- States
+					updateFlag = true
 				}
 			}
+			if updateFlag {
+				updateFlag = false
+				ElevatorStatesChan <- States
+			}
+			newRemoteStates.Unlock()
 			States.Unlock()
 
 		case <-transmittTimer:
