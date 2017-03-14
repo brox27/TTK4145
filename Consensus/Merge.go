@@ -2,7 +2,6 @@ package Consensus
 
 import (
 	"../ConfigFile"
-	//"fmt"
 	"sort"
 )
 

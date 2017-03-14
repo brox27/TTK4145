@@ -4,7 +4,7 @@ import (
 	"../ConfigFile"
 	"../Network"
 	"../driver"
-	"fmt"
+	//"fmt"
 	"time"
 )
 
@@ -32,7 +32,6 @@ func ConsensusCab(ClearCabOrderChan chan int, ConsensusCabChan chan map[string]*
 		select {
 
 		case remoteCabConsensus := <-cabOrdersRx:
-			fmt.Printf("ny remote: %+v \n", remoteCabConsensus)
 
 			for elevID := range remoteCabConsensus {
 				_, exists := AllCabOrders[elevID]
@@ -65,9 +64,7 @@ func ConsensusCab(ClearCabOrderChan chan int, ConsensusCabChan chan map[string]*
 			Activate(&AllCabOrders[ConfigFile.LocalID].CabButtons[NewCabButton])
 
 		case <-transmittTimer:
-			fmt.Printf("nå sender til remote \n")
 			cabOrdersTx <- AllCabOrders
-			fmt.Printf("nå sender til local \n")
 			localcabOrdersTx <- AllCabOrders
 
 		case PeerUpdate := <-PeerUpdateChan:

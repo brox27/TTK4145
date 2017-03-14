@@ -34,6 +34,7 @@ func ElevatorController(
 			switch LocalElev.State {
 
 			case ConfigFile.INITIALIZE:
+				println("case init")
 				driver.SetMotorDirection(ConfigFile.NEUTRAL)
 				LocalElev.State = ConfigFile.IDLE
 				LocalElev.Direction = ConfigFile.NEUTRAL
@@ -48,7 +49,6 @@ func ElevatorController(
 					orderTimerChan = time.After(15 * time.Second)
 				}
 				if shouldStop(LocalElev) {
-					println("i Moving NF")
 					clearOrders(&LocalElev, ClearHallOrdersChan, ClearCabOrderChan)
 					driver.SetMotorDirection(ConfigFile.NEUTRAL)
 					LocalElev.State = ConfigFile.DOORSOPEN
