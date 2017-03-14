@@ -21,3 +21,8 @@ simulate packet loss:
 
 Things that mayby should be a function...?
 * "ServidedOrder i FSM" aka vi clearer flere ganger? er dobble for loop i FSM flere steder...
+
+Off Topic:
+* NB! sjekk om den nå tåler chans uten buffer! !
+* funskjonsnavn
+* comments o.l-

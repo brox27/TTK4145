@@ -7,12 +7,8 @@ import (
 	"time"
 )
 
-//StateChan := make(chan ConfigFile.Elev)									// Fra FSM.go til StateFileNotYetMade
-//ElevatorStatesChan := make(chan map[string]*ConfigFile.Elev)		// Fra ElevatorStates til HallReqAss
-
 func ElevatorStatesCoordinator(StateChan chan ConfigFile.Elev, ElevatorStatesChan chan map[string]*ConfigFile.Elev) {
-	// tar inn ELEV struct fra StateChan -> sender "noe" på NW
-	//						-> sender "noe" til HallReqAss på ElevatorStatesChan
+
 	StateNetworkRx := make(chan map[string]*ConfigFile.Elev)
 	StateNetworkTx := make(chan map[string]*ConfigFile.Elev)
 	go Transmitter(ConfigFile.ElevatorStatesPort, StateNetworkTx)
