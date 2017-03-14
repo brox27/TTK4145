@@ -81,8 +81,10 @@ type ConsensusHall struct {
 	ID string
 }
 
+/*
 const ColorCC = "\x1b[38;5;177m"
 const ColorCH = "\x1b[38;5;175m"
 const ColorFSM = "\x1b[38;5;208m"
 const ColorHRA = "\x1b[38;5;79m"
 const ColorNone = "\x1b[0m" 
+*/
