@@ -94,15 +94,34 @@ func OrderAssigner(
 
 		case newElevatorStates := <-ElevatorStatesChan:
 			localCopy.Lock()
-			for elevID := range newElevatorStates.StateMap {
-				if elevID != "" {
-					if _, ok := newElevatorStates.StateMap[elevID]; ok {
-						if _, ok := localCopy.States[elevID]; ok {
-							temp := toAssignerCompatible(*newElevatorStates.StateMap[elevID])
+			/*
+				for elevID := range newElevatorStates.StateMap {
+					if elevID != "" {
+						if _, ok := newElevatorStates.StateMap[elevID]; ok {
+							if _, ok := localCopy.States[elevID]; ok {
+								temp := toAssignerCompatible(*newElevatorStates.StateMap[elevID])
+								temp.Lock()
+								localCopy.States[elevID].Behaviour = temp.Behaviour
+								localCopy.States[elevID].Floor = temp.Floor
+								localCopy.States[elevID].Direction = temp.Direction
+								temp.Unlock()
+							}
+						}
+					}
+					time.Sleep(3 * time.Millisecond)
+				}
+				localCopy.Unlock()
+			*/
+
+			for _, peer := range LivingPeers {
+				if peer != "" {
+					if _, ok := newElevatorStates.StateMap[peer]; ok {
+						if _, ok := localCopy.States[peer]; ok {
+							temp := toAssignerCompatible(*newElevatorStates.StateMap[peer])
 							temp.Lock()
-							localCopy.States[elevID].Behaviour = temp.Behaviour
-							localCopy.States[elevID].Floor = temp.Floor
-							localCopy.States[elevID].Direction = temp.Direction
+							localCopy.States[peer].Behaviour = temp.Behaviour
+							localCopy.States[peer].Floor = temp.Floor
+							localCopy.States[peer].Direction = temp.Direction
 							temp.Unlock()
 						}
 					}
@@ -110,24 +129,6 @@ func OrderAssigner(
 				time.Sleep(3 * time.Millisecond)
 			}
 			localCopy.Unlock()
-			/*
-				for _, peer := range LivingPeers {
-					if peer != "" {
-						if _, ok := newElevatorStates.StateMap[peer]; ok {
-							if _, ok := localCopy.States[peer]; ok {
-								temp := toAssignerCompatible(*newElevatorStates.StateMap[peer])
-								temp.Lock()
-								localCopy.States[peer].Behaviour = temp.Behaviour
-								localCopy.States[peer].Floor = temp.Floor
-								localCopy.States[peer].Direction = temp.Direction
-								temp.Unlock()
-							}
-						}
-					}
-					time.Sleep(3 * time.Millisecond)
-				}
-			*/
-			//		localCopy.Unlock()
 
 		case PeerUpdate := <-PeersToOrderAssignerChan:
 			fmt.Printf("Peer status %+v \n", PeerUpdate)
