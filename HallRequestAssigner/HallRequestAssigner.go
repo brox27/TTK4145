@@ -93,13 +93,17 @@ func HallRequestAssigner(
 			}
 
 		case newElevatorStates := <-ElevatorStatesChan:
-			shitCopy := newElevatorStates
+			//	Var1 := ConfigFile.AllStates{}
+			localCopy.Lock()
+			//	Var1.StateMap = make(map[string]*ConfigFile.Elev)
 			for _, peer := range LivingPeers {
 				if peer != "" {
-					localCopy.Lock()
-					if _, ok := shitCopy.StateMap[peer]; ok {
+					if _, ok := newElevatorStates.StateMap[peer]; ok {
 						if _, ok := localCopy.States[peer]; ok {
-							temp := toAssignerCompatible(*shitCopy.StateMap[peer])
+
+							//*newElevatorStates.StateMap[peer]
+
+							temp := toAssignerCompatible(*newElevatorStates.StateMap[peer])
 							temp.Lock()
 							localCopy.States[peer].Behaviour = temp.Behaviour
 							localCopy.States[peer].Floor = temp.Floor
@@ -107,10 +111,10 @@ func HallRequestAssigner(
 							temp.Unlock()
 						}
 					}
-					localCopy.Unlock()
 				}
-				time.Sleep(1 * time.Millisecond)
+				time.Sleep(3 * time.Millisecond)
 			}
+			localCopy.Unlock()
 
 			/* FROM:
 			newElevatorStates.Lock()
