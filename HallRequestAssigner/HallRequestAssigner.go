@@ -11,10 +11,11 @@ import (
 )
 
 type AssignerCompatibleElev struct {
-	Behaviour   string  `json:"behaviour"`
-	Floor       int     `json:"floor"`
-	Direction   string  `json:"direction"`
-	CabRequests [4]bool `json:"cabRequests"`
+	sync.RWMutex `json:"-"`
+	Behaviour    string  `json:"behaviour"`
+	Floor        int     `json:"floor"`
+	Direction    string  `json:"direction"`
+	CabRequests  [4]bool `json:"cabRequests"`
 }
 
 type AssignerCompatibleInput struct {
