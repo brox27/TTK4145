@@ -57,10 +57,11 @@ type OrderStatus struct {
 }
 
 type Elev struct {
-	State     States
-	Floor     int
-	Direction Direction
-	Orders    [][]bool
+	sync.RWMutex `json:"-"`
+	State        States
+	Floor        int
+	Direction    Direction
+	Orders       [][]bool
 }
 
 func NewElev() Elev {

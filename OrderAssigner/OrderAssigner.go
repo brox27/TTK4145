@@ -62,6 +62,9 @@ func OrderAssigner(
 	var LostPeers []string
 	var LivingPeers []string
 
+	var temp ConfigFile.Elev
+	var temp2 AssignerCompatibleElev
+
 	localCopy := AssignerCompatibleInput{}
 	localCopy.States = make(map[string]*AssignerCompatibleElev)
 	localCopy.States[ConfigFile.LocalID] = &AssignerCompatibleElev{}
@@ -117,12 +120,15 @@ func OrderAssigner(
 				if peer != "" {
 					if _, ok := newElevatorStates.StateMap[peer]; ok {
 						if _, ok := localCopy.States[peer]; ok {
-							temp := toAssignerCompatible(*newElevatorStates.StateMap[peer])
-							temp.Lock()
-							localCopy.States[peer].Behaviour = temp.Behaviour
-							localCopy.States[peer].Floor = temp.Floor
-							localCopy.States[peer].Direction = temp.Direction
-							temp.Unlock()
+							//	temp.Lock()
+							time.Sleep(3 * time.Millisecond)
+							temp = *newElevatorStates.StateMap[peer]
+							//temp := toAssignerCompatible(*newElevatorStates.StateMap[peer])
+							temp2 = toAssignerCompatible(temp)
+							localCopy.States[peer].Behaviour = temp2.Behaviour
+							localCopy.States[peer].Floor = temp2.Floor
+							localCopy.States[peer].Direction = temp2.Direction
+							//	temp.Unlock()
 						}
 					}
 				}
