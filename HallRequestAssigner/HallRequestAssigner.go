@@ -69,7 +69,6 @@ func HallRequestAssigner(
 	for {
 		select {
 		case newConsensusHall := <-ConsensusHallChan:
-	//		fmt.Printf("*HRA newConsensusHall\n")
 			for button := 0; button < 2; button++ {
 				for floor := 0; floor < ConfigFile.Num_floors; floor++ {
 					if newConsensusHall.HallButtons[floor][button].OrderState == ConfigFile.Active {
@@ -81,7 +80,6 @@ func HallRequestAssigner(
 			}
 
 		case newConsensusCab := <-ConsensusCabChan:
-//			fmt.Printf("*HRA newConsensusCab\n")
 			for elevID := range newConsensusCab {
 				if _, ok := localCopy.States[elevID]; ok {
 					for floor := 0; floor < ConfigFile.Num_floors; floor++ {
@@ -109,6 +107,8 @@ func HallRequestAssigner(
 					}
 				}
 			}
+
+			// ****************** IKKE FJERNET PGA USIKKER PÅ OM VI TRENGER? ****************** 
 			/*
 			fmt.Printf("*HRA newElevatorStates\n")
 			if !reflect.DeepEqual(newElevatorStates, localCopy.States){
@@ -153,7 +153,7 @@ func HallRequestAssigner(
         	}
 		}
 
-
+// 		***** Kept comments for debug purpose? ***** 
 //		fmt.Printf(ConfigFile.ColorHRA+"[HRA]: local copy:\n"+ConfigFile.ColorNone)
 //        fmt.Printf(ConfigFile.ColorHRA+"   HallRequests : %+v\n"+ConfigFile.ColorNone, localCopy.HallRequests)
 //        fmt.Printf(ConfigFile.ColorHRA+"   States : \n"+ConfigFile.ColorNone)
@@ -181,12 +181,9 @@ func HallRequestAssigner(
                 }
                 assignedOrders[f][2] = localCopy.States[ConfigFile.LocalID].CabRequests[f]
             }
-  //          fmt.Printf("*HRA aboce LocalOrdersChan\n")
             LocalOrdersChan <- assignedOrders
- //           fmt.Printf("*HRA below LocalOrdersChan\n")
         }else{
             fmt.Printf("err : %+v : %+v\n", err, result)
         }
-  //      fmt.Printf("*HRA end of for \n")        
     }
 }

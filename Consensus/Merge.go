@@ -107,7 +107,7 @@ func Activate(local *ConfigFile.OrderStatus){
 
 func Deactivate(local *ConfigFile.OrderStatus, LivingPeers []string){
 	if len(LivingPeers) == 0 || (len(LivingPeers) == 1  &&  LivingPeers[0] == ConfigFile.LocalID) {
-		local.OrderState = ConfigFile.Default		// mulig error
+		local.OrderState = ConfigFile.Default															// ****************** mulig error ******************
 	} else {
 		local.OrderState = ConfigFile.Inactive
 	}

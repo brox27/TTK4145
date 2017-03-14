@@ -54,23 +54,17 @@ func ConsensusHall(ClearHallOrderChan chan [2]int, ConsensusHallChan chan Config
 //            }
 
 		case ClearedHallOrder := <- ClearHallOrderChan:
-//			fmt.Printf(ConfigFile.ColorCH+"[CH]:  Cleared hall order: %+v\n"+ConfigFile.ColorNone, ClearedHallOrder)
 			Deactivate(&localHallConsensus.HallButtons[ClearedHallOrder[0]][ClearedHallOrder[1]], LivingPeers)
 			driver.SetButtonLamp(ConfigFile.ButtonType(ClearedHallOrder[1]), ClearedHallOrder[0], 0)
-	//		fmt.Printf("*CH above ConsensusHallChan \n")
 			ConsensusHallChan <- localHallConsensus
-	//		fmt.Printf("*CH below ConsensusHallChan \n")
 		
 		case NewHallButton := <-HallButtonChan:
-//			fmt.Printf(ConfigFile.ColorCH+"[CH]:  New hall button: %+v\n"+ConfigFile.ColorNone, NewHallButton)
 			Activate(&localHallConsensus.HallButtons[NewHallButton[0]][NewHallButton[1]])
-//			fmt.Printf(ConfigFile.ColorCH+"[CH]:  Our worldview: \n         %v\n"+ConfigFile.ColorNone, localHallConsensus)
 
 		case <- transmittTimer:
             hallordersTx <- localHallConsensus
 
         case PeerUpdate := <-PeerUpdateChan:
-//        	fmt.Printf(ConfigFile.ColorCH+"[CH]:  Peer update: %+v\n"+ConfigFile.ColorNone, PeerUpdate)
 			LivingPeers = PeerUpdate.Peers
 		}
 	}
