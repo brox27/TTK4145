@@ -1,5 +1,9 @@
 package ConfigFile
 
+import (
+	"sync"
+)
+
 const Num_floors = 4
 const Num_buttons = 3
 
@@ -14,6 +18,7 @@ const LocalHostPort = 15687
 var LocalID = ""
 
 type Direction int
+
 const (
 	UP Direction = iota
 	DOWN
@@ -21,14 +26,15 @@ const (
 )
 
 type ButtonType int
+
 const (
 	BUTTON_ORDER_UP ButtonType = iota
 	BUTTON_ORDER_DOWN
 	BUTTON_ORDER_COMMAND
 )
 
-
 type States int
+
 const (
 	INITIALIZE States = iota
 	IDLE
@@ -37,6 +43,7 @@ const (
 )
 
 type OrderState int
+
 const (
 	Default OrderState = iota
 	Inactive
@@ -73,10 +80,15 @@ type PeerUpdate struct {
 
 type ConsensusCab struct {
 	CabButtons [Num_floors]OrderStatus
-	ID string
+	ID         string
 }
 
 type ConsensusHall struct {
 	HallButtons [Num_floors][Num_buttons - 1]OrderStatus
-	ID string
+	ID          string
+}
+
+type AllStates struct {
+	sync.RWMutex `json:"-"`
+	StateMap     map[string]*Elev
 }

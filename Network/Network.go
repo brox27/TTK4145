@@ -15,7 +15,7 @@ import (
 // it on `port`
 func Transmitter(port int, chans ...interface{}) {
 	checkArgs(chans...)
-	n := 0	
+	n := 0
 	for range chans {
 		n++
 	}
@@ -42,7 +42,7 @@ func Transmitter(port int, chans ...interface{}) {
 
 func LocalTransmitter(port int, chans ...interface{}) {
 	checkArgs(chans...)
-	n := 0	
+	n := 0
 	for range chans {
 		n++
 	}

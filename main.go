@@ -9,9 +9,9 @@ import (
 	"./Peers"
 	"./driver"
 	"flag"
-	"runtime"
 	"os"
 	"os/signal"
+	"runtime"
 )
 
 func main() {
@@ -22,21 +22,21 @@ func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	// ** Setup of channels ** \\
-	FloorChan := make(chan int)                                        		// Fra driver.go til FSM.go
-	HallButtonChan := make(chan [2]int)                                		// fra driver.go til ConsensusHall
-	CabButtonChan := make(chan int)                                    		// Fra driver.go til ConsensusCab
-	ClearHallOrderChan := make(chan [2]int, 3)                            	// Fra FSM.go til ConsensusHall
-	ClearCabOrderChan := make(chan int, 3)                                	// Fra FSM.go til ConsensusCab
-	StateChan := make(chan ConfigFile.Elev,3)                           	// Fra FSM.go til ElevatorStatesCoord
-	PeerUpdateChan := make(chan ConfigFile.PeerUpdate)                 		// Fra Peers til Repeater
-	ConsensusCabChan := make(chan map[string]*ConfigFile.ConsensusCab, 3) 	// Fra ConsensusCab til HallReqAss
-	ConsensusHallChan := make(chan ConfigFile.ConsensusHall, 3)           	// Fra ConsensusHall til HallReqAss
-	ElevatorStatesChan := make(chan map[string]*ConfigFile.Elev,3)      	// Fra ElevatorStates til HallReqAss
-	TransmitEnable := make(chan bool)                                  		// Fra FSM til peers
-	LocalOrdersChan := make(chan [][]bool)							   		// Fra HallReqAss til FSM.go
-	FromPeersToConsensusHall := make(chan ConfigFile.PeerUpdate)			// Fra Repeater til ConsensusHall
-	FromPeersToConsensusCab := make(chan ConfigFile.PeerUpdate)				// Fra Repeater til ConsensusCab
-	FromPeersToHallReqAss := make(chan ConfigFile.PeerUpdate)				// Fra Repeater til HallReqAss
+	FloorChan := make(chan int)                                           // Fra driver.go til FSM.go
+	HallButtonChan := make(chan [2]int)                                   // fra driver.go til ConsensusHall
+	CabButtonChan := make(chan int)                                       // Fra driver.go til ConsensusCab
+	ClearHallOrderChan := make(chan [2]int, 3)                            // Fra FSM.go til ConsensusHall
+	ClearCabOrderChan := make(chan int, 3)                                // Fra FSM.go til ConsensusCab
+	StateChan := make(chan ConfigFile.Elev, 3)                            // Fra FSM.go til ElevatorStatesCoord
+	PeerUpdateChan := make(chan ConfigFile.PeerUpdate)                    // Fra Peers til Repeater
+	ConsensusCabChan := make(chan map[string]*ConfigFile.ConsensusCab, 3) // Fra ConsensusCab til HallReqAss
+	ConsensusHallChan := make(chan ConfigFile.ConsensusHall, 3)           // Fra ConsensusHall til HallReqAss
+	ElevatorStatesChan := make(chan ConfigFile.AllStates, 3)              // Fra ElevatorStates til HallReqAss
+	TransmitEnable := make(chan bool)                                     // Fra FSM til peers
+	LocalOrdersChan := make(chan [][]bool)                                // Fra HallReqAss til FSM.go
+	FromPeersToConsensusHall := make(chan ConfigFile.PeerUpdate)          // Fra Repeater til ConsensusHall
+	FromPeersToConsensusCab := make(chan ConfigFile.PeerUpdate)           // Fra Repeater til ConsensusCab
+	FromPeersToHallReqAss := make(chan ConfigFile.PeerUpdate)             // Fra Repeater til HallReqAss
 
 	driver.InitElev()
 
@@ -57,8 +57,8 @@ func main() {
 
 	println("System is running, all goroutines are active")
 	select {
-		case <- osSignal:
-			println("Interrupt detected, shutting down motor")
-			driver.SetMotorDirection(ConfigFile.NEUTRAL)
+	case <-osSignal:
+		println("Interrupt detected, shutting down motor")
+		driver.SetMotorDirection(ConfigFile.NEUTRAL)
 	}
 }

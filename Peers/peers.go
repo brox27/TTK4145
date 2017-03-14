@@ -1,13 +1,13 @@
 package Peers
 
 import (
-	"./conn"
 	"../ConfigFile"
+	"./conn"
 	"fmt"
 	"net"
+	"reflect"
 	"sort"
 	"time"
-	"reflect"
 )
 
 // ** This is the "peers module" from the "ofical" Network Module provided to us i GOlang - NOT something we wrote ourselves ** \\
@@ -62,7 +62,7 @@ func Receiver(port int, peerUpdateCh chan ConfigFile.PeerUpdate) {
 		// ** Removing dead connection ** \\
 		p.Lost = make([]string, 0)
 		for k, v := range lastSeen {
-			if time.Now().Sub(v) > timeout {
+			if (time.Now().Sub(v) > timeout) && (k != ConfigFile.LocalID) {
 				updated = true
 				p.Lost = append(p.Lost, k)
 				delete(lastSeen, k)
@@ -82,7 +82,6 @@ func Receiver(port int, peerUpdateCh chan ConfigFile.PeerUpdate) {
 		}
 	}
 }
-
 
 func Repeater(ch_in interface{}, chs_out ...interface{}) {
 	for {

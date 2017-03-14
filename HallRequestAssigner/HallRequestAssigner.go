@@ -53,7 +53,7 @@ func toAssignerCompatible(elev ConfigFile.Elev) AssignerCompatibleElev {
 func HallRequestAssigner(
 	ConsensusHallChan chan ConfigFile.ConsensusHall,
 	ConsensusCabChan chan map[string]*ConfigFile.ConsensusCab,
-	ElevatorStatesChan chan map[string]*ConfigFile.Elev,
+	ElevatorStatesChan chan ConfigFile.AllStates,
 	LocalOrdersChan chan [][]bool,
 	FromPeersToHallReqAss chan ConfigFile.PeerUpdate) {
 
@@ -90,12 +90,13 @@ func HallRequestAssigner(
 			}
 
 		case newElevatorStates := <-ElevatorStatesChan:
-			for elevID := range newElevatorStates {
+			newElevatorStates.Lock()
+			for elevID := range newElevatorStates.StateMap {
 				if elevID != "" {
 					localCopy.Lock()
 					annotherCopy := localCopy.States
 					if _, ok := annotherCopy[elevID]; ok {
-						tempCopy := newElevatorStates[elevID]
+						tempCopy := newElevatorStates.StateMap[elevID]
 						newCopy := toAssignerCompatible(*tempCopy)
 						localCopy.States[elevID].Behaviour = newCopy.Behaviour
 						localCopy.States[elevID].Floor = newCopy.Floor
@@ -105,6 +106,7 @@ func HallRequestAssigner(
 					localCopy.Unlock()
 				}
 			}
+			newElevatorStates.Unlock()
 
 		case PeerUpdate := <-FromPeersToHallReqAss:
 			fmt.Printf("Peer status %+v \n", PeerUpdate)
