@@ -60,7 +60,7 @@ func OrderAssigner(
 	PeersToOrderAssignerChan chan ConfigFile.PeerUpdate) {
 
 	var LostPeers []string
-	//	var LivingPeers []string
+	var LivingPeers []string
 
 	localCopy := AssignerCompatibleInput{}
 	localCopy.States = make(map[string]*AssignerCompatibleElev)
@@ -133,7 +133,7 @@ func OrderAssigner(
 		case PeerUpdate := <-PeersToOrderAssignerChan:
 			fmt.Printf("Peer status %+v \n", PeerUpdate)
 			LostPeers = PeerUpdate.Lost
-			//		LivingPeers = PeerUpdate.Peers
+			LivingPeers = PeerUpdate.Peers
 			if _, ok := localCopy.States[PeerUpdate.New]; !ok {
 				localCopy.States[PeerUpdate.New] = &AssignerCompatibleElev{}
 
