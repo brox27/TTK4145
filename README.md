@@ -43,6 +43,7 @@ Merge
 Driver mappen
 * bytte navn?
 FSM
+* RUN wtf!
 * fjerne comments
 * kan noe puttes i funksjoner?
 * butt for loop -> fikses i funksjon?

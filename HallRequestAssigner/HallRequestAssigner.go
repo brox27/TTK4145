@@ -98,9 +98,11 @@ func HallRequestAssigner(
 					if _, ok := newElevatorStates.StateMap[elevID]; ok {
 						if _, ok := localCopy.States[elevID]; ok {
 							temp := toAssignerCompatible(*newElevatorStates.StateMap[elevID])
+							temp.Lock()
 							localCopy.States[elevID].Behaviour = temp.Behaviour
 							localCopy.States[elevID].Floor = temp.Floor
 							localCopy.States[elevID].Direction = temp.Direction
+							temp.Unlock()
 						}
 					}
 					localCopy.Unlock()
