@@ -59,6 +59,7 @@ func HallRequestAssigner(
 	FromPeersToHallReqAss chan ConfigFile.PeerUpdate) {
 
 	var LostPeers []string
+	var LivingPeers []string
 
 	localCopy := AssignerCompatibleInput{}
 	localCopy.States = make(map[string]*AssignerCompatibleElev)
@@ -91,6 +92,25 @@ func HallRequestAssigner(
 			}
 
 		case newElevatorStates := <-ElevatorStatesChan:
+
+			for _, peer := range LivingPeers {
+				if peer != "" {
+					localCopy.Lock()
+					if _, ok := newElevatorStates.StateMap[peer]; ok {
+						if _, ok := localCopy.States[peer]; ok {
+							temp := toAssignerCompatible(*newElevatorStates.StateMap[peer])
+							temp.Lock()
+							localCopy.States[peer].Behaviour = temp.Behaviour
+							localCopy.States[peer].Floor = temp.Floor
+							localCopy.States[peer].Direction = temp.Direction
+							temp.Unlock()
+						}
+					}
+					localCopy.Unlock()
+				}
+			}
+
+			/* FROM:
 			newElevatorStates.Lock()
 			for elevID := range newElevatorStates.StateMap {
 				if elevID != "" {
@@ -110,10 +130,12 @@ func HallRequestAssigner(
 				}
 			}
 			newElevatorStates.Unlock()
+			*/
 
 		case PeerUpdate := <-FromPeersToHallReqAss:
 			fmt.Printf("Peer status %+v \n", PeerUpdate)
 			LostPeers = PeerUpdate.Lost
+			LivingPeers = PeerUpdate.Peers
 			if _, ok := localCopy.States[PeerUpdate.New]; !ok {
 				localCopy.States[PeerUpdate.New] = &AssignerCompatibleElev{}
 
