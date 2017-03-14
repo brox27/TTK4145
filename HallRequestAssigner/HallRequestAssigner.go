@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"sync"
+	"time"
 )
 
 type AssignerCompatibleElev struct {
@@ -92,13 +93,13 @@ func HallRequestAssigner(
 			}
 
 		case newElevatorStates := <-ElevatorStatesChan:
-
+			shitCopy := newElevatorStates
 			for _, peer := range LivingPeers {
 				if peer != "" {
 					localCopy.Lock()
-					if _, ok := newElevatorStates.StateMap[peer]; ok {
+					if _, ok := shitCopy.StateMap[peer]; ok {
 						if _, ok := localCopy.States[peer]; ok {
-							temp := toAssignerCompatible(*newElevatorStates.StateMap[peer])
+							temp := toAssignerCompatible(*shitCopy.StateMap[peer])
 							temp.Lock()
 							localCopy.States[peer].Behaviour = temp.Behaviour
 							localCopy.States[peer].Floor = temp.Floor
@@ -108,6 +109,7 @@ func HallRequestAssigner(
 					}
 					localCopy.Unlock()
 				}
+				time.Sleep(1 * time.Millisecond)
 			}
 
 			/* FROM:
