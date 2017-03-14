@@ -51,29 +51,12 @@ func RUN(
 				}
 				if shouldStop(LocalElev) {
 					println("i Moving NF")
-					atFloorStuff(&LocalElev, ClearHallOrdersChan, ClearCabOrderChan)
+					clearOrders(&LocalElev, ClearHallOrdersChan, ClearCabOrderChan)
 					driver.SetMotorDirection(ConfigFile.NEUTRAL)
 					LocalElev.State = ConfigFile.DOORSOPEN
 					driver.SetDoorOpenLamp(1)
 					doorTimerChan = time.After(3*time.Second)
 					StateChan <- LocalElev
-					/*
-					for button := 0; button < ConfigFile.Num_buttons; button++ {
-						if LocalElev.Orders[LocalElev.Floor][button] {
-							if button < ConfigFile.Num_buttons-1 {
-								ClearHallOrdersChan <- [2]int{LocalElev.Floor, button}
-							} else {
-								ClearCabOrderChan <- LocalElev.Floor
-							}
-						}
-					}
-
-					driver.SetMotorDirection(ConfigFile.NEUTRAL)
-					doorTimerChan = time.After(3*time.Second)
-					driver.SetDoorOpenLamp(1)
-					LocalElev.State = ConfigFile.DOORSOPEN
-					StateChan <- LocalElev
-					*/
 					break
 				}
 
@@ -108,30 +91,6 @@ func RUN(
 					StateChan <- LocalElev
 				}
 
-
-				//FRom this 
-/*
-				if nextDirection(LocalElev) != ConfigFile.NEUTRAL {
-					LocalElev.State = ConfigFile.MOVING
-					LocalElev.Direction = nextDirection(LocalElev)
-					driver.SetMotorDirection(LocalElev.Direction)
-					StateChan <- LocalElev
-				}else{
-					for button := 0; button < ConfigFile.Num_buttons; button++ {
-						if LocalElev.Orders[LocalElev.Floor][button] {
-							doorTimerChan = time.After(3*time.Second)
-							driver.SetDoorOpenLamp(1)
-							LocalElev.State = ConfigFile.DOORSOPEN
-							if button < ConfigFile.Num_buttons-1 {
-								ClearHallOrdersChan <- [2]int{LocalElev.Floor, button}
-							} else {
-								ClearCabOrderChan <- LocalElev.Floor
-							}
-						}
-					}
-				}
-
-				*/
 				break
 
 			case ConfigFile.MOVING:
@@ -142,12 +101,6 @@ func RUN(
 				break
 
 			case ConfigFile.DOORSOPEN:
-//				if shouldStop(LocalElev){
-//					println("i DOOOROPEN NO")
-//					atFloorStuff(&LocalElev, ClearHallOrdersChan, ClearCabOrderChan)
-//					doorTimerChan = time.After(3*time.Second)
-//					StateChan <- LocalElev
-//				}
 				if hasNewOrders(newOrders, LocalElev){
 					orderTimerChan = time.After(15*time.Second)
 					LocalElev.Orders = newOrders
