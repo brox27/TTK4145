@@ -17,7 +17,6 @@ func RUN(
 	var doorTimerChan <-chan time.Time
 	var orderTimerChan <- chan time.Time
 
-	// Init phase \\ -Anders <3
 	{
 		floor := driver.GetFloorSensorSignal()
 		if floor == -1 {
@@ -48,7 +47,7 @@ func RUN(
 			case ConfigFile.IDLE:
 				break
 
-			case ConfigFile.RUNNING:
+			case ConfigFile.MOVING:
 				if ordersAbove(LocalElev) || ordersBelow(LocalElev){
 					orderTimerChan = time.After(15*time.Second)
 				}
@@ -97,7 +96,7 @@ func RUN(
 				LocalElev.Orders = newOrders
 
 				if nextDirection(LocalElev) != ConfigFile.NEUTRAL {
-					LocalElev.State = ConfigFile.RUNNING
+					LocalElev.State = ConfigFile.MOVING
 					LocalElev.Direction = nextDirection(LocalElev)
 					driver.SetMotorDirection(LocalElev.Direction)
 					fmt.Printf("*FSM above StateChan")
@@ -123,8 +122,8 @@ func RUN(
 				}
 				break
 
-			case ConfigFile.RUNNING:
-				fmt.Printf("*FSM  was RUNNING \n")
+			case ConfigFile.MOVING:
+				fmt.Printf("*FSM  was MOVING \n")
 				if hasNewOrders(newOrders, LocalElev){
 					orderTimerChan = time.After(15*time.Second)
 				}
@@ -150,7 +149,7 @@ func RUN(
 			case ConfigFile.IDLE:
 				break
 
-			case ConfigFile.RUNNING:
+			case ConfigFile.MOVING:
 				break
 
 			case ConfigFile.DOORSOPEN:
@@ -158,7 +157,7 @@ func RUN(
 				LocalElev.Direction = nextDirection(LocalElev)
 
 				if LocalElev.Direction != ConfigFile.NEUTRAL {
-					LocalElev.State = ConfigFile.RUNNING
+					LocalElev.State = ConfigFile.MOVING
 					driver.SetMotorDirection(LocalElev.Direction)
 					StateChan <- LocalElev
 				} else {
@@ -246,7 +245,6 @@ func shouldStop(LocalElev ConfigFile.Elev) bool {
 	}
 	return false
 }
-
 
 func hasNewOrders(newOrders [][]bool, LocalElev ConfigFile.Elev) bool{
 	for f := 0; f < ConfigFile.Num_floors; f++{

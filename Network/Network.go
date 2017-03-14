@@ -37,6 +37,7 @@ func Transmitter(port int, chans ...interface{}) {
 		conn.WriteTo([]byte(typeNames[chosen]+string(buf)), addr)
 	}
 }
+
 func LocalTransmitter(port int, chans ...interface{}) {
 	checkArgs(chans...)
 	n := 0	

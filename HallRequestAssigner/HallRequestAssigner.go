@@ -32,7 +32,7 @@ func toAssignerCompatible(elev ConfigFile.Elev) AssignerCompatibleElev {
 			fallthrough
 		case ConfigFile.IDLE:
 			temp.Behaviour = "idle"
-		case ConfigFile.RUNNING:
+		case ConfigFile.MOVING:
 			temp.Behaviour = "moving"
 		case ConfigFile.DOORSOPEN:
 			temp.Behaviour = "doorOpen"

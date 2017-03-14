@@ -2,7 +2,7 @@ package Consensus
 
 import (
 	"../ConfigFile"
-	. "../Network"
+	"../Network"
 	"../driver"
 	"time"
 	"fmt"
@@ -12,12 +12,12 @@ import (
 func ConsensusCab(ClearCabOrderChan chan int, ConsensusCabChan chan map[string]*ConfigFile.ConsensusCab, CabButtonChan chan int, PeerUpdateChan chan ConfigFile.PeerUpdate) {
 	cabOrdersRx := make(chan map[string]*ConfigFile.ConsensusCab)
 	cabOrdersTx := make(chan map[string]*ConfigFile.ConsensusCab)
-	go Transmitter(ConfigFile.CabConsensusPort, cabOrdersTx)
-	go Receiver(ConfigFile.CabConsensusPort, cabOrdersRx)
+	go Network.Transmitter(ConfigFile.CabConsensusPort, cabOrdersTx)
+	go Network.LocalTransmitter(ConfigFile.CabConsensusPort, cabOrdersTx)
+	go Network.Receiver(ConfigFile.CabConsensusPort, cabOrdersRx)
+
 	transmittTimer := time.NewTicker(time.Millisecond * 50).C
-
-	go LocalTransmitter(ConfigFile.CabConsensusPort, cabOrdersTx)
-
+	
 	var LivingPeers []string
 
 	AllCabOrders := make(map[string]*ConfigFile.ConsensusCab)

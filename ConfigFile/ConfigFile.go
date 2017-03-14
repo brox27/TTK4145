@@ -32,7 +32,7 @@ type States int
 const (
 	INITIALIZE States = iota
 	IDLE
-	RUNNING
+	MOVING
 	DOORSOPEN
 )
 
