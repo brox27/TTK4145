@@ -16,6 +16,8 @@ func ConsensusCab(ClearCabOrderChan chan int, ConsensusCabChan chan map[string]*
 	go Receiver(ConfigFile.CabConsensusPort, cabOrdersRx)
 	transmittTimer := time.NewTicker(time.Millisecond * 50).C
 
+	go LocalTransmitter(ConfigFile.CabConsensusPort, cabOrdersTx)
+
 	var LivingPeers []string
 
 	AllCabOrders := make(map[string]*ConfigFile.ConsensusCab)
@@ -29,6 +31,7 @@ func ConsensusCab(ClearCabOrderChan chan int, ConsensusCabChan chan map[string]*
 		select {
 
 		case remoteCabConsensus := <-cabOrdersRx:
+			
 			for elevID := range remoteCabConsensus {
 				_, exists := AllCabOrders[elevID];
                 if !exists {
@@ -39,7 +42,6 @@ func ConsensusCab(ClearCabOrderChan chan int, ConsensusCabChan chan map[string]*
 				if !reflect.DeepEqual(remoteCabConsensus[elevID], AllCabOrders[elevID]) {
                     fmt.Printf(ConfigFile.ColorCC+"[CC]:  New worldview: %v\n"+ConfigFile.ColorNone, remoteCabConsensus[elevID])
                 }
-											
 				for floor := 0; floor < ConfigFile.Num_floors; floor++ {
 
 
@@ -80,6 +82,7 @@ func ConsensusCab(ClearCabOrderChan chan int, ConsensusCabChan chan map[string]*
 
 		case <- transmittTimer:
 			cabOrdersTx <- AllCabOrders
+
 
 		case PeerUpdate := <-PeerUpdateChan:
 			fmt.Printf("Peer update:\n  %+v\n", PeerUpdate)

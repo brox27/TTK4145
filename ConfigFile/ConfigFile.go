@@ -9,6 +9,7 @@ const HallConsensusPort = 15647
 const CabConsensusPort = 15657
 const ElevatorStatesPort = 15667
 const PeersPort = 15677
+const LocalHostPort = 15687
 
 var LocalID = ""
 
