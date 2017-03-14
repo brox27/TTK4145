@@ -5,8 +5,8 @@ import (
 	. "../Network"
 	"../driver"
 	"time"
-	"fmt"
-	"reflect"
+//	"fmt"
+//	"reflect"
 //	"fmt"
 )
 
@@ -30,9 +30,9 @@ func ConsensusHall(ClearHallOrderChan chan [2]int, ConsensusHallChan chan Config
 	for {
 		select {
 		case remoteHallConsensus := <-hallordersRx:
-			if !reflect.DeepEqual(remoteHallConsensus, localHallConsensus) {
-               	fmt.Printf(ConfigFile.ColorCH+"[CH]:  New worldview: %v\n"+ConfigFile.ColorNone, remoteHallConsensus)
-            }
+//			if !reflect.DeepEqual(remoteHallConsensus, localHallConsensus) {
+ //              	fmt.Printf(ConfigFile.ColorCH+"[CH]:  New worldview: %v\n"+ConfigFile.ColorNone, remoteHallConsensus)
+ //           }
 			RemoteID := remoteHallConsensus.ID
 			for floor := 0; floor < ConfigFile.Num_floors; floor++ {
 				for button := 0; button < ConfigFile.Num_buttons-1; button++ {
@@ -49,28 +49,28 @@ func ConsensusHall(ClearHallOrderChan chan [2]int, ConsensusHallChan chan Config
                         })
 				}
 			}
-            if !reflect.DeepEqual(remoteHallConsensus, localHallConsensus) {
-                fmt.Printf(ConfigFile.ColorCH+"[CH]:  Worldview updated: \n   From: %v\n   To:   %v\n"+ConfigFile.ColorNone, remoteHallConsensus, localHallConsensus)
-            }
+    //        if !reflect.DeepEqual(remoteHallConsensus, localHallConsensus) {
+   //             fmt.Printf(ConfigFile.ColorCH+"[CH]:  Worldview updated: \n   From: %v\n   To:   %v\n"+ConfigFile.ColorNone, remoteHallConsensus, localHallConsensus)
+//            }
 
 		case ClearedHallOrder := <- ClearHallOrderChan:
-			fmt.Printf(ConfigFile.ColorCH+"[CH]:  Cleared hall order: %+v\n"+ConfigFile.ColorNone, ClearedHallOrder)
+//			fmt.Printf(ConfigFile.ColorCH+"[CH]:  Cleared hall order: %+v\n"+ConfigFile.ColorNone, ClearedHallOrder)
 			Deactivate(&localHallConsensus.HallButtons[ClearedHallOrder[0]][ClearedHallOrder[1]], LivingPeers)
 			driver.SetButtonLamp(ConfigFile.ButtonType(ClearedHallOrder[1]), ClearedHallOrder[0], 0)
-			fmt.Printf("*CH above ConsensusHallChan \n")
+	//		fmt.Printf("*CH above ConsensusHallChan \n")
 			ConsensusHallChan <- localHallConsensus
-			fmt.Printf("*CH below ConsensusHallChan \n")
+	//		fmt.Printf("*CH below ConsensusHallChan \n")
 		
 		case NewHallButton := <-HallButtonChan:
-			fmt.Printf(ConfigFile.ColorCH+"[CH]:  New hall button: %+v\n"+ConfigFile.ColorNone, NewHallButton)
+//			fmt.Printf(ConfigFile.ColorCH+"[CH]:  New hall button: %+v\n"+ConfigFile.ColorNone, NewHallButton)
 			Activate(&localHallConsensus.HallButtons[NewHallButton[0]][NewHallButton[1]])
-			fmt.Printf(ConfigFile.ColorCH+"[CH]:  Our worldview: \n         %v\n"+ConfigFile.ColorNone, localHallConsensus)
+//			fmt.Printf(ConfigFile.ColorCH+"[CH]:  Our worldview: \n         %v\n"+ConfigFile.ColorNone, localHallConsensus)
 
 		case <- transmittTimer:
             hallordersTx <- localHallConsensus
 
         case PeerUpdate := <-PeerUpdateChan:
-        	fmt.Printf(ConfigFile.ColorCH+"[CH]:  Peer update: %+v\n"+ConfigFile.ColorNone, PeerUpdate)
+//        	fmt.Printf(ConfigFile.ColorCH+"[CH]:  Peer update: %+v\n"+ConfigFile.ColorNone, PeerUpdate)
 			LivingPeers = PeerUpdate.Peers
 		}
 	}

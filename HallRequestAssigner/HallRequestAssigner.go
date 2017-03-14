@@ -69,7 +69,7 @@ func HallRequestAssigner(
 	for {
 		select {
 		case newConsensusHall := <-ConsensusHallChan:
-			fmt.Printf("*HRA newConsensusHall\n")
+	//		fmt.Printf("*HRA newConsensusHall\n")
 			for button := 0; button < 2; button++ {
 				for floor := 0; floor < ConfigFile.Num_floors; floor++ {
 					if newConsensusHall.HallButtons[floor][button].OrderState == ConfigFile.Active {
@@ -81,7 +81,7 @@ func HallRequestAssigner(
 			}
 
 		case newConsensusCab := <-ConsensusCabChan:
-			fmt.Printf("*HRA newConsensusCab\n")
+//			fmt.Printf("*HRA newConsensusCab\n")
 			for elevID := range newConsensusCab {
 				if _, ok := localCopy.States[elevID]; ok {
 					for floor := 0; floor < ConfigFile.Num_floors; floor++ {
@@ -154,13 +154,13 @@ func HallRequestAssigner(
 		}
 
 
-		fmt.Printf(ConfigFile.ColorHRA+"[HRA]: local copy:\n"+ConfigFile.ColorNone)
-        fmt.Printf(ConfigFile.ColorHRA+"   HallRequests : %+v\n"+ConfigFile.ColorNone, localCopy.HallRequests)
-        fmt.Printf(ConfigFile.ColorHRA+"   States : \n"+ConfigFile.ColorNone)
+//		fmt.Printf(ConfigFile.ColorHRA+"[HRA]: local copy:\n"+ConfigFile.ColorNone)
+//        fmt.Printf(ConfigFile.ColorHRA+"   HallRequests : %+v\n"+ConfigFile.ColorNone, localCopy.HallRequests)
+//        fmt.Printf(ConfigFile.ColorHRA+"   States : \n"+ConfigFile.ColorNone)
 
-        for e := range localCopy.States {
-            fmt.Printf(ConfigFile.ColorHRA+"     %v : %+v\n"+ConfigFile.ColorNone, e, localCopy.States[e])
-        }
+  //      for e := range localCopy.States {
+   //         fmt.Printf(ConfigFile.ColorHRA+"     %v : %+v\n"+ConfigFile.ColorNone, e, localCopy.States[e])
+   //     }
 
         arg, _ := json.Marshal(localCopy)
         dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
@@ -181,12 +181,12 @@ func HallRequestAssigner(
                 }
                 assignedOrders[f][2] = localCopy.States[ConfigFile.LocalID].CabRequests[f]
             }
-            fmt.Printf("*HRA aboce LocalOrdersChan\n")
+  //          fmt.Printf("*HRA aboce LocalOrdersChan\n")
             LocalOrdersChan <- assignedOrders
-            fmt.Printf("*HRA below LocalOrdersChan\n")
+ //           fmt.Printf("*HRA below LocalOrdersChan\n")
         }else{
             fmt.Printf("err : %+v : %+v\n", err, result)
         }
-        fmt.Printf("*HRA end of for \n")        
+  //      fmt.Printf("*HRA end of for \n")        
     }
 }
