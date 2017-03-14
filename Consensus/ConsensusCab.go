@@ -11,10 +11,10 @@ import (
 func ConsensusCab(ClearCabOrderChan chan int, ConsensusCabChan chan map[string]*ConfigFile.ConsensusCab, CabButtonChan chan int, PeerUpdateChan chan ConfigFile.PeerUpdate) {
 	cabOrdersRx := make(chan map[string]*ConfigFile.ConsensusCab)
 	cabOrdersTx := make(chan map[string]*ConfigFile.ConsensusCab)
-	//localcabOrdersTx := make(chan map[string]*ConfigFile.ConsensusCab)
+	localcabOrdersTx := make(chan map[string]*ConfigFile.ConsensusCab)
 
 	go Network.Transmitter(ConfigFile.CabConsensusPort, cabOrdersTx)
-	go Network.LocalTransmitter(ConfigFile.CabConsensusPort, cabOrdersTx)
+	go Network.LocalTransmitter(ConfigFile.CabConsensusPort, localcabOrdersTx)
 	go Network.Receiver(ConfigFile.CabConsensusPort, cabOrdersRx)
 
 	transmittTimer := time.NewTicker(time.Millisecond * 50).C
@@ -67,8 +67,8 @@ func ConsensusCab(ClearCabOrderChan chan int, ConsensusCabChan chan map[string]*
 		case <-transmittTimer:
 			fmt.Printf("nå sender til remote \n")
 			cabOrdersTx <- AllCabOrders
-			///fmt.Printf("nå sender til local \n")
-			//localcabOrdersTx <- AllCabOrders
+			fmt.Printf("nå sender til local \n")
+			localcabOrdersTx <- AllCabOrders
 
 		case PeerUpdate := <-PeerUpdateChan:
 			LivingPeers = PeerUpdate.Peers

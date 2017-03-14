@@ -1,4 +1,4 @@
-package FSM
+package Elevator
 
 import (
 	"../ConfigFile"
@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func RUN(
+func ElevatorController(
 	FloorChan chan int, StateChan chan ConfigFile.Elev,
 	LocalOrdersChan chan [][]bool,
 	ClearHallOrdersChan chan [2]int, ClearCabOrderChan chan int, TransmitEnable chan bool) {
@@ -29,7 +29,6 @@ func RUN(
 		case newFloor := <-FloorChan:
 			fmt.Printf("New floor: %+v\n", newFloor)
 			LocalElev.Floor = newFloor
-			//StateChan <- LocalElev
 			driver.SetFloorLight(newFloor)
 
 			switch LocalElev.State {
@@ -109,7 +108,6 @@ func RUN(
 						doorTimerChan = time.After(3 * time.Second)
 					}
 				}
-				//LocalElev.Orders = newOrders
 				break
 			}
 
@@ -142,7 +140,6 @@ func RUN(
 
 		case <-orderTimerChan:
 			if LocalElev.State != ConfigFile.IDLE {
-				println("jeg tror jeg er stuck...")
 				TransmitEnable <- false
 				driver.SetMotorDirection(ConfigFile.NEUTRAL)
 				time.Sleep(20 * time.Second)

@@ -11,21 +11,21 @@ func Merge(local *ConfigFile.OrderStatus, remote ConfigFile.OrderStatus, RemoteI
 	switch local.OrderState {
 
 	case ConfigFile.Default:
-			switch remote.OrderState {
-			case ConfigFile.Default:
-				break
-			case ConfigFile.Inactive:
-				local.OrderState = ConfigFile.Inactive
-				local.AckdBy = local.AckdBy[:0]
-				break
-			case ConfigFile.PendingAck:
-				local.OrderState = ConfigFile.PendingAck
-				local.AckdBy = append(remote.AckdBy, ConfigFile.LocalID)
-				break
-			case ConfigFile.Active:
-				local.OrderState = ConfigFile.Active
-				local.AckdBy = append(remote.AckdBy, ConfigFile.LocalID)
-				onActive()
+		switch remote.OrderState {
+		case ConfigFile.Default:
+			break
+		case ConfigFile.Inactive:
+			local.OrderState = ConfigFile.Inactive
+			local.AckdBy = local.AckdBy[:0]
+			break
+		case ConfigFile.PendingAck:
+			local.OrderState = ConfigFile.PendingAck
+			local.AckdBy = append(remote.AckdBy, ConfigFile.LocalID)
+			break
+		case ConfigFile.Active:
+			local.OrderState = ConfigFile.Active
+			local.AckdBy = append(remote.AckdBy, ConfigFile.LocalID)
+			onActive()
 		}
 
 	case ConfigFile.Inactive:
@@ -39,7 +39,7 @@ func Merge(local *ConfigFile.OrderStatus, remote ConfigFile.OrderStatus, RemoteI
 			local.AckdBy = append(remote.AckdBy, ConfigFile.LocalID)
 			break
 		case ConfigFile.Active:
-			break 
+			break
 		}
 
 	case ConfigFile.PendingAck:
@@ -53,7 +53,7 @@ func Merge(local *ConfigFile.OrderStatus, remote ConfigFile.OrderStatus, RemoteI
 			local.AckdBy = append(remote.AckdBy, ConfigFile.LocalID)
 			sort.Strings(local.AckdBy)
 			local.AckdBy = removeDuplicates(local.AckdBy)
-			if checkAcks(local.AckdBy, LivingPeers){
+			if checkAcks(local.AckdBy, LivingPeers) {
 				local.OrderState = ConfigFile.Active
 				onActive()
 			}
@@ -92,7 +92,7 @@ func Merge(local *ConfigFile.OrderStatus, remote ConfigFile.OrderStatus, RemoteI
 
 }
 
-func Activate(local *ConfigFile.OrderStatus){
+func Activate(local *ConfigFile.OrderStatus) {
 	switch local.OrderState {
 	case ConfigFile.Default:
 		fallthrough
@@ -103,8 +103,8 @@ func Activate(local *ConfigFile.OrderStatus){
 	}
 }
 
-func Deactivate(local *ConfigFile.OrderStatus, LivingPeers []string){
-	if len(LivingPeers) == 0 || (len(LivingPeers) == 1  &&  LivingPeers[0] == ConfigFile.LocalID) {
+func Deactivate(local *ConfigFile.OrderStatus, LivingPeers []string) {
+	if len(LivingPeers) == 0 || (len(LivingPeers) == 1 && LivingPeers[0] == ConfigFile.LocalID) {
 		local.OrderState = ConfigFile.Default
 	} else {
 		local.OrderState = ConfigFile.Inactive
@@ -113,30 +113,30 @@ func Deactivate(local *ConfigFile.OrderStatus, LivingPeers []string){
 }
 
 func removeDuplicates(elements []string) []string {
-    encountered := map[string]bool{}
-    result := []string{}
+	encountered := map[string]bool{}
+	result := []string{}
 
-    for v := range elements {
-        if encountered[elements[v]] == true {
-        } else {
-            encountered[elements[v]] = true
-            result = append(result, elements[v])
-        }
-    }
-    return result
+	for v := range elements {
+		if encountered[elements[v]] == true {
+		} else {
+			encountered[elements[v]] = true
+			result = append(result, elements[v])
+		}
+	}
+	return result
 }
 
-func checkAcks(acks []string, LivingPeers []string) bool{
-	if (len(acks) >= len(LivingPeers)) && (LivingPeers != nil){
+func checkAcks(acks []string, LivingPeers []string) bool {
+	if (len(acks) >= len(LivingPeers)) && (LivingPeers != nil) {
 		globalFlag := true
-		for _, i := range LivingPeers{
+		for _, i := range LivingPeers {
 			flag := false
-			for _, j :=range acks{
-				if(i == j){
+			for _, j := range acks {
+				if i == j {
 					flag = true
 				}
 			}
-			if(!flag){
+			if !flag {
 				globalFlag = false
 			}
 		}

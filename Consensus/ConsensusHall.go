@@ -2,7 +2,7 @@ package Consensus
 
 import (
 	"../ConfigFile"
-	. "../Network"
+	"../Network"
 	"../driver"
 	"time"
 )
@@ -10,8 +10,8 @@ import (
 func ConsensusHall(ClearHallOrderChan chan [2]int, ConsensusHallChan chan ConfigFile.ConsensusHall, HallButtonChan chan [2]int, PeerUpdateChan chan ConfigFile.PeerUpdate) {
 	hallordersRx := make(chan ConfigFile.ConsensusHall)
 	hallordersTx := make(chan ConfigFile.ConsensusHall)
-	go Transmitter(ConfigFile.HallConsensusPort, hallordersTx)
-	go Receiver(ConfigFile.HallConsensusPort, hallordersRx)
+	go Network.Transmitter(ConfigFile.HallConsensusPort, hallordersTx)
+	go Network.Receiver(ConfigFile.HallConsensusPort, hallordersRx)
 	transmittTimer := time.NewTicker(time.Millisecond * 50).C
 
 	var LivingPeers []string

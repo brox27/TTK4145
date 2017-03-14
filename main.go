@@ -3,9 +3,9 @@ package main
 import (
 	"./ConfigFile"
 	"./Consensus"
+	"./Elevator"
 	"./ElevatorStates"
-	"./FSM"
-	"./HallRequestAssigner"
+	"./OrderAssigner"
 	"./Peers"
 	"./driver"
 	"flag"
@@ -21,36 +21,34 @@ func main() {
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	// ** Setup of channels ** \\
-	FloorChan := make(chan int)                                           // Fra driver.go til FSM.go
-	HallButtonChan := make(chan [2]int)                                   // fra driver.go til ConsensusHall
-	CabButtonChan := make(chan int)                                       // Fra driver.go til ConsensusCab
-	ClearHallOrderChan := make(chan [2]int, 3)                            // Fra FSM.go til ConsensusHall
-	ClearCabOrderChan := make(chan int, 3)                                // Fra FSM.go til ConsensusCab
-	StateChan := make(chan ConfigFile.Elev, 3)                            // Fra FSM.go til ElevatorStatesCoord
-	PeerUpdateChan := make(chan ConfigFile.PeerUpdate)                    // Fra Peers til Repeater
-	ConsensusCabChan := make(chan map[string]*ConfigFile.ConsensusCab, 3) // Fra ConsensusCab til HallReqAss
-	ConsensusHallChan := make(chan ConfigFile.ConsensusHall, 3)           // Fra ConsensusHall til HallReqAss
-	ElevatorStatesChan := make(chan ConfigFile.AllStates, 3)              // Fra ElevatorStates til HallReqAss
-	TransmitEnable := make(chan bool)                                     // Fra FSM til peers
-	LocalOrdersChan := make(chan [][]bool)                                // Fra HallReqAss til FSM.go
-	FromPeersToConsensusHall := make(chan ConfigFile.PeerUpdate)          // Fra Repeater til ConsensusHall
-	FromPeersToConsensusCab := make(chan ConfigFile.PeerUpdate)           // Fra Repeater til ConsensusCab
-	FromPeersToHallReqAss := make(chan ConfigFile.PeerUpdate)             // Fra Repeater til HallReqAss
+	FloorChan := make(chan int)
+	HallButtonChan := make(chan [2]int)
+	CabButtonChan := make(chan int)
+	ClearHallOrderChan := make(chan [2]int, 3)
+	ClearCabOrderChan := make(chan int, 3)
+	StateChan := make(chan ConfigFile.Elev, 3)
+	ConsensusCabChan := make(chan map[string]*ConfigFile.ConsensusCab, 3)
+	ConsensusHallChan := make(chan ConfigFile.ConsensusHall, 3)
+	ElevatorStatesChan := make(chan ConfigFile.AllStates, 3)
+	LocalOrdersChan := make(chan [][]bool)
+	TransmitEnableChan := make(chan bool)
+	PeerUpdateChan := make(chan ConfigFile.PeerUpdate)
+	PeersToConsensusHallChan := make(chan ConfigFile.PeerUpdate)
+	PeersToConsensusCabChan := make(chan ConfigFile.PeerUpdate)
+	PeersToOrderAssignerChan := make(chan ConfigFile.PeerUpdate)
 
 	driver.InitElev()
 
-	// ** start GO routines ** \\
 	go driver.ButtonPoll(HallButtonChan, CabButtonChan)
 	go driver.FloorPoll(FloorChan)
-	go FSM.RUN(FloorChan, StateChan, LocalOrdersChan, ClearHallOrderChan, ClearCabOrderChan, TransmitEnable)
-	go Consensus.ConsensusHall(ClearHallOrderChan, ConsensusHallChan, HallButtonChan, FromPeersToConsensusHall)
-	go Consensus.ConsensusCab(ClearCabOrderChan, ConsensusCabChan, CabButtonChan, FromPeersToConsensusCab)
+	go Elevator.ElevatorController(FloorChan, StateChan, LocalOrdersChan, ClearHallOrderChan, ClearCabOrderChan, TransmitEnableChan)
+	go Consensus.ConsensusHall(ClearHallOrderChan, ConsensusHallChan, HallButtonChan, PeersToConsensusHallChan)
+	go Consensus.ConsensusCab(ClearCabOrderChan, ConsensusCabChan, CabButtonChan, PeersToConsensusCabChan)
 	go ElevatorStates.ElevatorStatesCoordinator(StateChan, ElevatorStatesChan)
-	go hallRequestAssigner.HallRequestAssigner(ConsensusHallChan, ConsensusCabChan, ElevatorStatesChan, LocalOrdersChan, FromPeersToHallReqAss)
-	go Peers.Transmitter(ConfigFile.PeersPort, ConfigFile.LocalID, TransmitEnable)
+	go orderAssigner.OrderAssigner(ConsensusHallChan, ConsensusCabChan, ElevatorStatesChan, LocalOrdersChan, PeersToOrderAssignerChan)
+	go Peers.Transmitter(ConfigFile.PeersPort, ConfigFile.LocalID, TransmitEnableChan)
 	go Peers.Receiver(ConfigFile.PeersPort, PeerUpdateChan)
-	go Peers.Repeater(PeerUpdateChan, FromPeersToConsensusHall, FromPeersToConsensusCab, FromPeersToHallReqAss)
+	go Peers.Repeater(PeerUpdateChan, PeersToConsensusHallChan, PeersToConsensusCabChan, PeersToOrderAssignerChan)
 
 	osSignal := make(chan os.Signal)
 	signal.Notify(osSignal, os.Interrupt)

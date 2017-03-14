@@ -1,4 +1,4 @@
-package hallRequestAssigner
+package orderAssigner
 
 import (
 	"../ConfigFile"
@@ -52,7 +52,7 @@ func toAssignerCompatible(elev ConfigFile.Elev) AssignerCompatibleElev {
 	return temp
 }
 
-func HallRequestAssigner(
+func OrderAssigner(
 	ConsensusHallChan chan ConfigFile.ConsensusHall,
 	ConsensusCabChan chan map[string]*ConfigFile.ConsensusCab,
 	ElevatorStatesChan chan ConfigFile.AllStates,

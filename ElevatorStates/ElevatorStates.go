@@ -2,7 +2,7 @@ package ElevatorStates
 
 import (
 	"../ConfigFile"
-	. "../Network"
+	"../Network"
 	"time"
 )
 
@@ -10,13 +10,12 @@ func ElevatorStatesCoordinator(StateChan chan ConfigFile.Elev, ElevatorStatesCha
 
 	StateNetworkRx := make(chan ConfigFile.AllStates)
 	StateNetworkTx := make(chan ConfigFile.AllStates)
-	go Transmitter(ConfigFile.ElevatorStatesPort, StateNetworkTx)
-	go Receiver(ConfigFile.ElevatorStatesPort, StateNetworkRx)
+	go Network.Transmitter(ConfigFile.ElevatorStatesPort, StateNetworkTx)
+	go Network.Receiver(ConfigFile.ElevatorStatesPort, StateNetworkRx)
 	transmittTimer := time.NewTicker(time.Millisecond * 50).C
 
 	States := ConfigFile.AllStates{}
 	States.StateMap = make(map[string]*ConfigFile.Elev)
-	//	AllStates := map[string]*ConfigFile.Elev{}
 
 	for {
 		select {
