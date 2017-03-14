@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func ConsensusHall(ClearHallOrderChan chan [2]int, ConsensusHallChan chan ConfigFile.ConsensusHall,  HallButtonChan chan [2]int, PeerUpdateChan chan ConfigFile.PeerUpdate) {
+func ConsensusHall(ClearHallOrderChan chan [2]int, ConsensusHallChan chan ConfigFile.ConsensusHall, HallButtonChan chan [2]int, PeerUpdateChan chan ConfigFile.PeerUpdate) {
 	hallordersRx := make(chan ConfigFile.ConsensusHall)
 	hallordersTx := make(chan ConfigFile.ConsensusHall)
 	go Transmitter(ConfigFile.HallConsensusPort, hallordersTx)
@@ -18,7 +18,7 @@ func ConsensusHall(ClearHallOrderChan chan [2]int, ConsensusHallChan chan Config
 	localHallConsensus := ConfigFile.ConsensusHall{}
 	localHallConsensus.ID = ConfigFile.LocalID
 	for floor := 0; floor < ConfigFile.Num_floors; floor++ {
-		for button := 0; button < ConfigFile.Num_buttons-1; button ++{
+		for button := 0; button < ConfigFile.Num_buttons-1; button++ {
 			localHallConsensus.HallButtons[floor][button].OrderState = ConfigFile.Default
 		}
 	}
@@ -31,30 +31,30 @@ func ConsensusHall(ClearHallOrderChan chan [2]int, ConsensusHallChan chan Config
 				for button := 0; button < ConfigFile.Num_buttons-1; button++ {
 
 					remote := remoteHallConsensus.HallButtons[floor][button]
-					Merge(&localHallConsensus.HallButtons[floor][button], remote, RemoteID, LivingPeers, 
+					Merge(&localHallConsensus.HallButtons[floor][button], remote, RemoteID, LivingPeers,
 						func() {
 							driver.SetButtonLamp(ConfigFile.ButtonType(button), floor, 1)
 							ConsensusHallChan <- localHallConsensus
-                        }, 
+						},
 						func() {
-                            driver.SetButtonLamp(ConfigFile.ButtonType(button), floor, 0)
-                            ConsensusHallChan <- localHallConsensus
-                        })
+							driver.SetButtonLamp(ConfigFile.ButtonType(button), floor, 0)
+							ConsensusHallChan <- localHallConsensus
+						})
 				}
 			}
 
-		case ClearedHallOrder := <- ClearHallOrderChan:
+		case ClearedHallOrder := <-ClearHallOrderChan:
 			Deactivate(&localHallConsensus.HallButtons[ClearedHallOrder[0]][ClearedHallOrder[1]], LivingPeers)
 			driver.SetButtonLamp(ConfigFile.ButtonType(ClearedHallOrder[1]), ClearedHallOrder[0], 0)
 			ConsensusHallChan <- localHallConsensus
-		
+
 		case NewHallButton := <-HallButtonChan:
 			Activate(&localHallConsensus.HallButtons[NewHallButton[0]][NewHallButton[1]])
 
-		case <- transmittTimer:
-            hallordersTx <- localHallConsensus
+		case <-transmittTimer:
+			hallordersTx <- localHallConsensus
 
-        case PeerUpdate := <-PeerUpdateChan:
+		case PeerUpdate := <-PeerUpdateChan:
 			LivingPeers = PeerUpdate.Peers
 		}
 	}
