@@ -9,6 +9,8 @@ import (
 	"strings"
 )
 
+// ** This is "ofical" Network Module provided to us i GOlang - NOT something we wrote ourselves ** \\
+
 // Encodes received values from `chans` into type-tagged JSON, then broadcasts
 // it on `port`
 func Transmitter(port int, chans ...interface{}) {

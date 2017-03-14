@@ -49,7 +49,15 @@ func RUN(
 				if ordersAbove(LocalElev) || ordersBelow(LocalElev){
 					orderTimerChan = time.After(15*time.Second)
 				}
-				if shouldStop(LocalElev) { 												// ****************** se over, kan ha noen mangler, eks. når heisen allerede står i etg hvor det bestilles
+				if shouldStop(LocalElev) {
+					println("i Moving NF")
+					atFloorStuff(&LocalElev, ClearHallOrdersChan, ClearCabOrderChan)
+					driver.SetMotorDirection(ConfigFile.NEUTRAL)
+					LocalElev.State = ConfigFile.DOORSOPEN
+					driver.SetDoorOpenLamp(1)
+					doorTimerChan = time.After(3*time.Second)
+					StateChan <- LocalElev
+					/*
 					for button := 0; button < ConfigFile.Num_buttons; button++ {
 						if LocalElev.Orders[LocalElev.Floor][button] {
 							if button < ConfigFile.Num_buttons-1 {
@@ -65,6 +73,7 @@ func RUN(
 					driver.SetDoorOpenLamp(1)
 					LocalElev.State = ConfigFile.DOORSOPEN
 					StateChan <- LocalElev
+					*/
 					break
 				}
 
@@ -84,6 +93,24 @@ func RUN(
 				}
 				LocalElev.Orders = newOrders
 
+				if shouldStop(LocalElev){
+					clearOrders(&LocalElev, ClearHallOrdersChan, ClearCabOrderChan)
+					driver.SetMotorDirection(ConfigFile.NEUTRAL)
+					LocalElev.State = ConfigFile.DOORSOPEN
+					driver.SetDoorOpenLamp(1)
+					doorTimerChan = time.After(3*time.Second)
+					StateChan <- LocalElev
+
+				}else if nextDirection(LocalElev) != ConfigFile.NEUTRAL {
+					LocalElev.State = ConfigFile.MOVING
+					LocalElev.Direction = nextDirection(LocalElev)
+					driver.SetMotorDirection(LocalElev.Direction)
+					StateChan <- LocalElev
+				}
+
+
+				//FRom this 
+/*
 				if nextDirection(LocalElev) != ConfigFile.NEUTRAL {
 					LocalElev.State = ConfigFile.MOVING
 					LocalElev.Direction = nextDirection(LocalElev)
@@ -103,6 +130,8 @@ func RUN(
 						}
 					}
 				}
+
+				*/
 				break
 
 			case ConfigFile.MOVING:
@@ -113,10 +142,23 @@ func RUN(
 				break
 
 			case ConfigFile.DOORSOPEN:
+//				if shouldStop(LocalElev){
+//					println("i DOOOROPEN NO")
+//					atFloorStuff(&LocalElev, ClearHallOrdersChan, ClearCabOrderChan)
+//					doorTimerChan = time.After(3*time.Second)
+//					StateChan <- LocalElev
+//				}
 				if hasNewOrders(newOrders, LocalElev){
 					orderTimerChan = time.After(15*time.Second)
+					LocalElev.Orders = newOrders
+					if shouldStop(LocalElev){
+						clearOrders(&LocalElev, ClearHallOrdersChan, ClearCabOrderChan)
+						driver.SetDoorOpenLamp(1)
+						driver.SetMotorDirection(ConfigFile.NEUTRAL)
+						doorTimerChan = time.After(3*time.Second)
+					}
 				}
-				LocalElev.Orders = newOrders
+				//LocalElev.Orders = newOrders
 				break
 			}
 
@@ -235,4 +277,16 @@ func hasNewOrders(newOrders [][]bool, LocalElev ConfigFile.Elev) bool{
 		}
 	}
 	return false
+}
+
+func clearOrders(LocalElev *ConfigFile.Elev, ClearHallOrdersChan chan [2]int, ClearCabOrderChan chan int){
+	for button := 0; button < ConfigFile.Num_buttons; button++{
+		if LocalElev.Orders[LocalElev.Floor][button] {
+			if button < ConfigFile.Num_buttons-1 {
+				ClearHallOrdersChan <- [2]int{LocalElev.Floor, button}
+			} else {
+				ClearCabOrderChan <- LocalElev.Floor
+			}
+		}
+	}
 }

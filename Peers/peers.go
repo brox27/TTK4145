@@ -10,13 +10,15 @@ import (
 	"reflect"
 )
 
+// ** This is the "peers module" from the "ofical" Network Module provided to us i GOlang - NOT something we wrote ourselves ** \\
+
 const interval = 10 * time.Millisecond
 const timeout = 200 * time.Millisecond
 
 func Transmitter(port int, id string, transmitEnable <-chan bool) {
 
 	conn := conn.DialBroadcastUDP(port)
-	addr, _ := net.ResolveUDPAddr("udp4", fmt.Sprintf("255.255.255.255:%d", port))		// net.ResolveUDPAddr("udp4", fmt.Sprintf("255.255.255.255:%d", port))	 || "udp4", fmt.Sprintf(id,":%d", port)
+	addr, _ := net.ResolveUDPAddr("udp4", fmt.Sprintf("255.255.255.255:%d", port))
 
 	enable := true
 	for {
@@ -46,7 +48,7 @@ func Receiver(port int, peerUpdateCh chan ConfigFile.PeerUpdate) {
 
 		id := string(buf[:n])
 
-		// Adding new connection
+		// ** Adding new connection ** \\
 		p.New = ""
 		if id != "" {
 			if _, idExists := lastSeen[id]; !idExists {
@@ -57,7 +59,7 @@ func Receiver(port int, peerUpdateCh chan ConfigFile.PeerUpdate) {
 			lastSeen[id] = time.Now()
 		}
 
-		// Removing dead connection
+		// ** Removing dead connection ** \\
 		p.Lost = make([]string, 0)
 		for k, v := range lastSeen {
 			if time.Now().Sub(v) > timeout {
@@ -66,7 +68,7 @@ func Receiver(port int, peerUpdateCh chan ConfigFile.PeerUpdate) {
 				delete(lastSeen, k)
 			}
 		}
-		// Sending update
+		// ** Sending update ** \\
 		if updated {
 			p.Peers = make([]string, 0, len(lastSeen))
 

@@ -3,7 +3,6 @@ package hallRequestAssigner
 import (
 	"../ConfigFile"
 	"encoding/json"
-	//"reflect"
 	"fmt"
 	"path/filepath"
 	"os/exec"
@@ -108,34 +107,6 @@ func HallRequestAssigner(
 				}
 			}
 
-			// ****************** IKKE FJERNET PGA USIKKER PÅ OM VI TRENGER? ****************** 
-			/*
-			fmt.Printf("*HRA newElevatorStates\n")
-			if !reflect.DeepEqual(newElevatorStates, localCopy.States){
-				fmt.Printf("*HRA above for\n")
-			for elevID := range newElevatorStates {
-				fmt.Printf("*HRA above if 1\n")
-				if (elevID!=""){
-					fmt.Printf("*HRA above if 2\n")
-					if _, ok := localCopy.States[elevID]; ok {
-						fmt.Printf("*HRA in if 2, 1\n")
-						temp := toAssignerCompatible(*newElevatorStates[elevID])
-						fmt.Printf("*HRA in if 2, 2\n")
-						localCopy.States[elevID].Behaviour = temp.Behaviour
-						fmt.Printf("*HRA in if 2, 3\n")
-						localCopy.States[elevID].Floor = temp.Floor
-						fmt.Printf("*HRA in if 2, 4\n")
-						localCopy.States[elevID].Direction = temp.Direction
-						fmt.Printf("*HRA in if 2, 5\n")
-
-			*/		
-				/*
-						localCopy.States[elevID].Behaviour
-						 = toAssignerCompatible(newElevatorStates[elevID]).Behaviour
-						localCopy.States[elevID].Floor = toAssignerCompatible(newElevatorStates[elevID]).Floor
-						localCopy.States[elevID].Direction = toAssignerCompatible(newElevatorStates[elevID]).Direction
-						*/
-
 		case PeerUpdate := <- FromPeersToHallReqAss:
 			fmt.Printf("Peer status %+v \n",PeerUpdate )
 			LostPeers = PeerUpdate.Lost
@@ -152,15 +123,6 @@ func HallRequestAssigner(
 				localCopy.States=temp
         	}
 		}
-
-// 		***** Kept comments for debug purpose? ***** 
-//		fmt.Printf(ConfigFile.ColorHRA+"[HRA]: local copy:\n"+ConfigFile.ColorNone)
-//        fmt.Printf(ConfigFile.ColorHRA+"   HallRequests : %+v\n"+ConfigFile.ColorNone, localCopy.HallRequests)
-//        fmt.Printf(ConfigFile.ColorHRA+"   States : \n"+ConfigFile.ColorNone)
-
-  //      for e := range localCopy.States {
-   //         fmt.Printf(ConfigFile.ColorHRA+"     %v : %+v\n"+ConfigFile.ColorNone, e, localCopy.States[e])
-   //     }
 
         arg, _ := json.Marshal(localCopy)
         dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
@@ -183,7 +145,7 @@ func HallRequestAssigner(
             }
             LocalOrdersChan <- assignedOrders
         }else{
-            fmt.Printf("err : %+v : %+v\n", err, result)
+            fmt.Printf("error : %+v : %+v\n", err, result)
         }
     }
 }

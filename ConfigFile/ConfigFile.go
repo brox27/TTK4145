@@ -80,11 +80,3 @@ type ConsensusHall struct {
 	HallButtons [Num_floors][Num_buttons - 1]OrderStatus
 	ID string
 }
-
-/*
-const ColorCC = "\x1b[38;5;177m"
-const ColorCH = "\x1b[38;5;175m"
-const ColorFSM = "\x1b[38;5;208m"
-const ColorHRA = "\x1b[38;5;79m"
-const ColorNone = "\x1b[0m" 
-*/

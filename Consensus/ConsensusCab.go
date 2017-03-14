@@ -5,8 +5,6 @@ import (
 	"../Network"
 	"../driver"
 	"time"
-//	"fmt"
-//	"reflect"
 )
 
 func ConsensusCab(ClearCabOrderChan chan int, ConsensusCabChan chan map[string]*ConfigFile.ConsensusCab, CabButtonChan chan int, PeerUpdateChan chan ConfigFile.PeerUpdate) {
@@ -38,9 +36,6 @@ func ConsensusCab(ClearCabOrderChan chan int, ConsensusCabChan chan map[string]*
 					AllCabOrders[elevID] = remoteCabConsensus[elevID]
 				}
 
-	//			if !reflect.DeepEqual(remoteCabConsensus[elevID], AllCabOrders[elevID]) {
-  	//          	fmt.Printf(ConfigFile.ColorCC+"[CC]:  New worldview: %v\n"+ConfigFile.ColorNone, remoteCabConsensus[elevID])
-    //          }
 				for floor := 0; floor < ConfigFile.Num_floors; floor++ {
 
 
@@ -56,11 +51,6 @@ func ConsensusCab(ClearCabOrderChan chan int, ConsensusCabChan chan map[string]*
 							ConsensusCabChan <- AllCabOrders
 						})
 				}
-
-	//			if !reflect.DeepEqual(remoteCabConsensus[elevID], AllCabOrders[elevID]) {
-    //		      	fmt.Printf(ConfigFile.ColorCC+"[CC]:  Worldview updated: \n   From: %v\n   To:   %v\n"+ConfigFile.ColorNone, remoteCabConsensus[elevID], AllCabOrders[elevID])
-    // 		    }
-    //		fmt.Printf("*CC end of remoteCabConsensus channel \n")
 			}
 
 		case ClearedCabOrder := <- ClearCabOrderChan:

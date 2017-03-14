@@ -3,7 +3,6 @@ package ElevatorStates
 import (
 	"../ConfigFile"
 	. "../Network"
-	//. "fmt"
 	"time"
 )
 

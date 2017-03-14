@@ -11,7 +11,6 @@ func Merge(local *ConfigFile.OrderStatus, remote ConfigFile.OrderStatus, RemoteI
 	switch local.OrderState {
 
 	case ConfigFile.Default:
-	//	if RemoteID != ConfigFile.LocalID {
 			switch remote.OrderState {
 			case ConfigFile.Default:
 				break
@@ -27,7 +26,6 @@ func Merge(local *ConfigFile.OrderStatus, remote ConfigFile.OrderStatus, RemoteI
 				local.OrderState = ConfigFile.Active
 				local.AckdBy = append(remote.AckdBy, ConfigFile.LocalID)
 				onActive()
-	//	}
 		}
 
 	case ConfigFile.Inactive:
@@ -107,7 +105,7 @@ func Activate(local *ConfigFile.OrderStatus){
 
 func Deactivate(local *ConfigFile.OrderStatus, LivingPeers []string){
 	if len(LivingPeers) == 0 || (len(LivingPeers) == 1  &&  LivingPeers[0] == ConfigFile.LocalID) {
-		local.OrderState = ConfigFile.Default															// ****************** MULIG ERROR??? ******************
+		local.OrderState = ConfigFile.Default
 	} else {
 		local.OrderState = ConfigFile.Inactive
 	}

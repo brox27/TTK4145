@@ -26,3 +26,26 @@ Off Topic:
 * NB! sjekk om den nå tåler chans uten buffer! !
 * funskjonsnavn
 * comments o.l-
+
+Final CodeComplete
+Main
+* rekkefølge ting blir tatt inn i 
+ConfigFile
+* fjerne noen vi ikke bruker
+ConsensusHall
+* fjerne comments
+ConsensusCab
+* fjerne comments
+ElevatorStates
+* fjerne comments
+Merge
+* fjerne comments
+Driver mappen
+* bytte navn?
+FSM
+* fjerne comments
+* kan noe puttes i funksjoner?
+* butt for loop -> fikses i funksjon?
+HalLReqAss
+* fjerne comments
+* bytte navn
