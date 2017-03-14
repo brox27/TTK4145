@@ -95,7 +95,6 @@ func HallRequestAssigner(
 					localCopy.Lock()
 					annotherCopy := localCopy.States
 					if _, ok := annotherCopy[elevID]; ok {
-						localCopy.Lock()
 						tempCopy := newElevatorStates[elevID]
 						newCopy := toAssignerCompatible(*tempCopy)
 						localCopy.States[elevID].Behaviour = newCopy.Behaviour
