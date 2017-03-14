@@ -25,12 +25,14 @@ func ElevatorStatesCoordinator(StateChan chan ConfigFile.Elev, ElevatorStatesCha
 			ElevatorStatesChan <- States
 
 		case newRemoteStates := <-StateNetworkRx:
+			States.Lock()
 			for elevID := range newRemoteStates.StateMap {
 				if elevID != ConfigFile.LocalID && States.StateMap[elevID] != newRemoteStates.StateMap[elevID] {
 					States.StateMap[elevID] = newRemoteStates.StateMap[elevID]
 					ElevatorStatesChan <- States
 				}
 			}
+			States.Unlock()
 
 		case <-transmittTimer:
 			StateNetworkTx <- States
