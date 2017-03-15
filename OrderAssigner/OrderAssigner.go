@@ -97,38 +97,17 @@ func OrderAssigner(
 
 		case newElevatorStates := <-ElevatorStatesChan:
 			localCopy.Lock()
-			/*
-				for elevID := range newElevatorStates.StateMap {
-					if elevID != "" {
-						if _, ok := newElevatorStates.StateMap[elevID]; ok {
-							if _, ok := localCopy.States[elevID]; ok {
-								temp := toAssignerCompatible(*newElevatorStates.StateMap[elevID])
-								temp.Lock()
-								localCopy.States[elevID].Behaviour = temp.Behaviour
-								localCopy.States[elevID].Floor = temp.Floor
-								localCopy.States[elevID].Direction = temp.Direction
-								temp.Unlock()
-							}
-						}
-					}
-					time.Sleep(3 * time.Millisecond)
-				}
-				localCopy.Unlock()
-			*/
 
 			for _, peer := range LivingPeers {
 				if peer != "" {
 					if _, ok := newElevatorStates.StateMap[peer]; ok {
 						if _, ok := localCopy.States[peer]; ok {
-							//	temp.Lock()
 							time.Sleep(3 * time.Millisecond)
 							temp = *newElevatorStates.StateMap[peer]
-							//temp := toAssignerCompatible(*newElevatorStates.StateMap[peer])
 							temp2 = toAssignerCompatible(temp)
 							localCopy.States[peer].Behaviour = temp2.Behaviour
 							localCopy.States[peer].Floor = temp2.Floor
 							localCopy.States[peer].Direction = temp2.Direction
-							//	temp.Unlock()
 						}
 					}
 				}

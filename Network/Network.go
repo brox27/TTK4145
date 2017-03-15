@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-// ** This is "ofical" Network Module provided to us i GOlang - NOT something we wrote ourselves ** \\
+// ** This is "offical" Network Module provided to us inn GOlang - NOT something we wrote ourselves ** \\
 
 // Encodes received values from `chans` into type-tagged JSON, then broadcasts
 // it on `port`

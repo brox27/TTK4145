@@ -14,6 +14,8 @@ func ElevatorStatesCoordinator(StateChan chan ConfigFile.Elev, ElevatorStatesCha
 	go Network.Receiver(ConfigFile.ElevatorStatesPort, StateNetworkRx)
 	transmittTimer := time.NewTicker(time.Millisecond * 50).C
 
+	
+
 	States := ConfigFile.AllStates{}
 	States.StateMap = make(map[string]*ConfigFile.Elev)
 	updateFlag := true
@@ -42,6 +44,7 @@ func ElevatorStatesCoordinator(StateChan chan ConfigFile.Elev, ElevatorStatesCha
 
 		case <-transmittTimer:
 			StateNetworkTx <- States
+
 		}
 
 	}
